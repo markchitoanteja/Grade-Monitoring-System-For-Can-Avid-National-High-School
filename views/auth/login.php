@@ -70,7 +70,7 @@ if (isset($_SESSION["user_id"])) {
 
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/jquery/jquery.min.js"></script>
-    <script src="assets/js/login.js"></script>
+    <script src="assets/js/login.js?v=1.0.1"></script>
 </body>
 
 </html>
