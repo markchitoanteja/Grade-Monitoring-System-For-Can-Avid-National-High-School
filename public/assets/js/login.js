@@ -1,6 +1,6 @@
 jQuery(document).ready(function () {
-    preventDevTools(false);
-    preventMobileAccess();
+    preventDevTools(true);
+    preventMobileAccess(true);
 
     $("#login_form").submit(function () {
         const username = $("#login_username").val();
@@ -68,7 +68,9 @@ jQuery(document).ready(function () {
         });
     }
 
-    function preventMobileAccess() {
+    function preventMobileAccess(enable) {
+        if (!enable) return;
+
         if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             document.body.innerHTML = `
             <div style="display: flex; height: 100vh; align-items: center; justify-content: center; background-color: #f8d7da; color: #721c24; text-align: center; padding: 20px; font-family: Arial, sans-serif;">
