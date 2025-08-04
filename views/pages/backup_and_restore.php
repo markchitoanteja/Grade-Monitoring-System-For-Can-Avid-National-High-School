@@ -17,7 +17,7 @@ if (!isset($_SESSION["user_id"])) {
         exit();
     }
 
-    $backup_dir = 'backup/';
+    $backup_dir = 'public/backup/';
     $files = array_diff(scandir($backup_dir), array('.', '..'));
 
     $files = array_filter($files, function ($file) use ($backup_dir) {
@@ -30,7 +30,7 @@ if (!isset($_SESSION["user_id"])) {
 }
 ?>
 
-<?php include_once "../views/pages/templates/header.php" ?>
+<?php include_once "views/pages/templates/header.php" ?>
 
 <main id="main" class="main">
     <div class="pagetitle">
@@ -93,7 +93,7 @@ if (!isset($_SESSION["user_id"])) {
     </section>
 </main>
 
-<?php include_once "../views/pages/components/new_teacher.php" ?>
-<?php include_once "../views/pages/components/update_teacher.php" ?>
+<?php include_once "views/pages/components/new_teacher.php" ?>
+<?php include_once "views/pages/components/update_teacher.php" ?>
 
-<?php include_once "../views/pages/templates/footer.php" ?>
+<?php include_once "views/pages/templates/footer.php" ?>

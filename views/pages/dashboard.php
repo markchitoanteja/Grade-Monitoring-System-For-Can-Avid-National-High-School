@@ -19,7 +19,7 @@ if (!isset($_SESSION["user_id"])) {
 }
 ?>
 
-<?php include_once "../views/pages/templates/header.php" ?>
+<?php include_once "views/pages/templates/header.php" ?>
 
 <main id="main" class="main">
     <div class="pagetitle">
@@ -102,7 +102,7 @@ if (!isset($_SESSION["user_id"])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if ($logs = $db->select_all("logs")): ?>
+                                <?php if ($logs = $db->select_all("logs", "id", "DESC")): ?>
                                     <?php foreach ($logs as $log): ?>
                                         <tr>
                                             <td><?= (new DateTime($log["created_at"]))->format('F j, Y h:i A') ?></td>
@@ -120,4 +120,4 @@ if (!isset($_SESSION["user_id"])) {
     </section>
 </main>
 
-<?php include_once "../views/pages/templates/footer.php" ?>
+<?php include_once "views/pages/templates/footer.php" ?>

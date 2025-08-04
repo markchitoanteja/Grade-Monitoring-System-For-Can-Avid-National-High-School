@@ -21,7 +21,7 @@ if (!isset($_SESSION["user_id"])) {
 $able_to_put_grades = $db->check_subject_weight($_SESSION["user_id"]);
 ?>
 
-<?php include_once "../views/pages/templates/header.php" ?>
+<?php include_once "views/pages/templates/header.php" ?>
 
 <main id="main" class="main">
     <div class="pagetitle">
@@ -98,7 +98,7 @@ $able_to_put_grades = $db->check_subject_weight($_SESSION["user_id"]);
     </section>
 </main>
 
-<?php include_once "../views/pages/components/new_student_grade.php" ?>
-<?php include_once "../views/pages/components/update_student_grade.php" ?>
+<?php include_once "views/pages/components/new_student_grade.php" ?>
+<?php include_once "views/pages/components/update_student_grade.php" ?>
 
-<?php include_once "../views/pages/templates/footer.php" ?>
+<?php include_once "views/pages/templates/footer.php" ?>

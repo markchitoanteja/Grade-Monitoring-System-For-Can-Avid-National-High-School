@@ -1,4 +1,6 @@
 <?php
+$db = new Database();
+
 $current_page = basename($_SERVER['REQUEST_URI']);
 
 $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
@@ -35,20 +37,20 @@ function get_initials($first_name)
 
     <title><?= ucfirst($current_page) ?> - Grade Monitoring System</title>
 
-    <link rel="shortcut icon" href="assets/img/logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= base_url('public/assets/img/logo.png') ?>" type="image/x-icon">
 
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-    <link href="assets/vendor/sweetalert2/css/sweetalert2.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url('public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('public/assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('public/assets/vendor/simple-datatables/style.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('public/assets/vendor/sweetalert2/css/sweetalert2.min.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('public/assets/css/style.css') ?>" rel="stylesheet">
 </head>
 
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
-                <img src="assets/img/logo.png" alt="">
+                <img src="<?= base_url('public/assets/img/logo.png') ?>" alt="">
                 <span class="d-none d-lg-block">Grading System</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -58,7 +60,7 @@ function get_initials($first_name)
             <ul class="d-flex align-items-center">
                 <li class="nav-item dropdown pe-3">
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="assets/img/uploads/<?= $user_data["image"] ?>" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
+                        <img src="<?= base_url('public/assets/img/uploads/') ?><?= $user_data["image"] ?>" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
                         <span class="d-none d-md-block dropdown-toggle ps-2"><?= $_SESSION["user_type"] != "admin" ? get_initials($teacher_student_data["first_name"]) . " " . $teacher_student_data["last_name"] : $user_data["name"] ?></span>
                     </a>
 

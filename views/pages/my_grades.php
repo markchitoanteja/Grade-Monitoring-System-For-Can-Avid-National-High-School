@@ -15,7 +15,7 @@ if (!isset($_SESSION["user_id"])) {
         exit();
     }
 
-    include_once "../views/pages/templates/header.php";
+    include_once "views/pages/templates/header.php";
 
     $student_id = $_SESSION["user_id"];
 
@@ -163,4 +163,4 @@ if (!isset($_SESSION["user_id"])) {
     </section>
 </main>
 
-<?php include_once "../views/pages/templates/footer.php" ?>
+<?php include_once "views/pages/templates/footer.php" ?>

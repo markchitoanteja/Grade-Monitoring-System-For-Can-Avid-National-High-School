@@ -31,7 +31,7 @@ jQuery(document).ready(function () {
         formData.append('logout', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -39,7 +39,7 @@ jQuery(document).ready(function () {
             contentType: false,
             success: function (response) {
                 if (response) {
-                    location.href = "/";
+                    location.href = base_url;
                 }
             },
             error: function (_, _, error) {
@@ -61,7 +61,7 @@ jQuery(document).ready(function () {
         formData.append('get_admin_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -73,7 +73,7 @@ jQuery(document).ready(function () {
 
                 $("#account_settings_name").val(response.name);
                 $("#account_settings_username").val(response.username);
-                $("#account_settings_image_display").attr("src", "assets/img/uploads/" + response.image);
+                $("#account_settings_image_display").attr("src", base_url + "public/assets/img/uploads/" + response.image);
                 $("#account_settings_id").val(response.id);
                 $("#account_settings_old_password").val(response.password);
                 $("#account_settings_old_image").val(response.image);
@@ -138,7 +138,7 @@ jQuery(document).ready(function () {
             formData.append('update_admin_account', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -218,7 +218,7 @@ jQuery(document).ready(function () {
         formData.append('new_course', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -269,7 +269,7 @@ jQuery(document).ready(function () {
                 formData.append('delete_course', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -303,7 +303,7 @@ jQuery(document).ready(function () {
         formData.append('get_course_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -348,7 +348,7 @@ jQuery(document).ready(function () {
         formData.append('update_course', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -389,7 +389,7 @@ jQuery(document).ready(function () {
         formData.append('get_course_data_by_code', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -443,7 +443,7 @@ jQuery(document).ready(function () {
         formData.append('new_subject', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -494,7 +494,7 @@ jQuery(document).ready(function () {
                 formData.append('delete_subject', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -528,7 +528,7 @@ jQuery(document).ready(function () {
         formData.append('get_subject_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -551,7 +551,7 @@ jQuery(document).ready(function () {
                     formData_2.append('get_course_data_by_code', true);
 
                     $.ajax({
-                        url: 'server',
+                        url: base_url + 'server',
                         data: formData_2,
                         type: 'POST',
                         dataType: 'JSON',
@@ -619,7 +619,7 @@ jQuery(document).ready(function () {
         formData.append('update_subject', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -655,7 +655,7 @@ jQuery(document).ready(function () {
         formData.append('get_course_data_by_code', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -750,7 +750,7 @@ jQuery(document).ready(function () {
             formData.append('new_teacher', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -829,7 +829,7 @@ jQuery(document).ready(function () {
         formData.append('get_teacher_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -882,7 +882,7 @@ jQuery(document).ready(function () {
                 formData.append('delete_teacher', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -975,7 +975,7 @@ jQuery(document).ready(function () {
             formData.append('update_teacher', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -1111,7 +1111,7 @@ jQuery(document).ready(function () {
             formData.append('new_student', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -1159,7 +1159,7 @@ jQuery(document).ready(function () {
         formData.append('get_course_data_by_code', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1241,7 +1241,7 @@ jQuery(document).ready(function () {
         formData.append('get_student_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1276,7 +1276,7 @@ jQuery(document).ready(function () {
                 formData_2.append('get_course_data_by_code', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData_2,
                     type: 'POST',
                     dataType: 'JSON',
@@ -1330,7 +1330,7 @@ jQuery(document).ready(function () {
                 formData.append('delete_student', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -1429,7 +1429,7 @@ jQuery(document).ready(function () {
             formData.append('update_student', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -1477,7 +1477,7 @@ jQuery(document).ready(function () {
         formData.append('get_course_data_by_code', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1570,7 +1570,7 @@ jQuery(document).ready(function () {
         formData.append('new_grade_component', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1644,7 +1644,7 @@ jQuery(document).ready(function () {
         formData.append('get_grade_component_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1689,7 +1689,7 @@ jQuery(document).ready(function () {
                 formData.append('delete_grade_component', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -1734,7 +1734,7 @@ jQuery(document).ready(function () {
         formData.append('update_grade_component', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1805,7 +1805,7 @@ jQuery(document).ready(function () {
         formData.append('get_student_data_by_account_id', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -1821,7 +1821,7 @@ jQuery(document).ready(function () {
                 formData_2.append('get_course_data_by_code', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData_2,
                     type: 'POST',
                     dataType: 'JSON',
@@ -1866,7 +1866,7 @@ jQuery(document).ready(function () {
                             formData_3.append('get_subjects', true);
 
                             $.ajax({
-                                url: 'server',
+                                url: base_url + 'server',
                                 data: formData_3,
                                 type: 'POST',
                                 dataType: 'JSON',
@@ -1915,7 +1915,7 @@ jQuery(document).ready(function () {
             formData.append('get_subjects', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -1954,7 +1954,7 @@ jQuery(document).ready(function () {
             formData.append('get_subjects', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -1996,7 +1996,7 @@ jQuery(document).ready(function () {
         formData.append('get_grade_component_data_by_teacher_id_and_subject_id', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2117,7 +2117,7 @@ jQuery(document).ready(function () {
         formData.append('new_student_grade', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2154,7 +2154,7 @@ jQuery(document).ready(function () {
                 formData.append('delete_student_grade', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -2188,7 +2188,7 @@ jQuery(document).ready(function () {
         formData.append('get_student_grade_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2206,7 +2206,7 @@ jQuery(document).ready(function () {
                 formData_2.append('get_student_data_by_account_id', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData_2,
                     type: 'POST',
                     dataType: 'JSON',
@@ -2222,7 +2222,7 @@ jQuery(document).ready(function () {
                         formData_3.append('get_course_data_by_code', true);
 
                         $.ajax({
-                            url: 'server',
+                            url: base_url + 'server',
                             data: formData_3,
                             type: 'POST',
                             dataType: 'JSON',
@@ -2267,7 +2267,7 @@ jQuery(document).ready(function () {
                                     formData_4.append('get_subjects', true);
 
                                     $.ajax({
-                                        url: 'server',
+                                        url: base_url + 'server',
                                         data: formData_4,
                                         type: 'POST',
                                         dataType: 'JSON',
@@ -2295,7 +2295,7 @@ jQuery(document).ready(function () {
                                                 formData_5.append('get_grade_component_data_by_teacher_id_and_subject_id', true);
 
                                                 $.ajax({
-                                                    url: 'server',
+                                                    url: base_url + 'server',
                                                     data: formData_5,
                                                     type: 'POST',
                                                     dataType: 'JSON',
@@ -2363,7 +2363,7 @@ jQuery(document).ready(function () {
         formData.append('get_student_data_by_account_id', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2379,7 +2379,7 @@ jQuery(document).ready(function () {
                 formData_2.append('get_course_data_by_code', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData_2,
                     type: 'POST',
                     dataType: 'JSON',
@@ -2424,7 +2424,7 @@ jQuery(document).ready(function () {
                             formData_3.append('get_subjects', true);
 
                             $.ajax({
-                                url: 'server',
+                                url: base_url + 'server',
                                 data: formData_3,
                                 type: 'POST',
                                 dataType: 'JSON',
@@ -2473,7 +2473,7 @@ jQuery(document).ready(function () {
             formData.append('get_subjects', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -2512,7 +2512,7 @@ jQuery(document).ready(function () {
             formData.append('get_subjects', true);
 
             $.ajax({
-                url: 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -2563,7 +2563,7 @@ jQuery(document).ready(function () {
         formData.append('get_grade_component_data_by_teacher_id_and_subject_id', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2692,7 +2692,7 @@ jQuery(document).ready(function () {
         formData.append('update_student_grade', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2729,7 +2729,7 @@ jQuery(document).ready(function () {
         formData.append('get_grade_data', true);
 
         $.ajax({
-            url: 'server',
+            url: base_url + 'server',
             data: formData,
             type: 'POST',
             dataType: 'JSON',
@@ -2767,7 +2767,7 @@ jQuery(document).ready(function () {
                 formData.append('backup_database', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',
@@ -2807,7 +2807,7 @@ jQuery(document).ready(function () {
                 formData.append('restore_database', true);
 
                 $.ajax({
-                    url: 'server',
+                    url: base_url + 'server',
                     data: formData,
                     type: 'POST',
                     dataType: 'JSON',

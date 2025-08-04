@@ -23,7 +23,7 @@ jQuery(document).ready(function () {
             formData.append('login', true);
 
             $.ajax({
-                url: 'server',
+                url:  base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',

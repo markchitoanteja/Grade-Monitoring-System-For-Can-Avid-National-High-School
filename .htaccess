@@ -1,5 +1,6 @@
 RewriteEngine On
+RewriteBase /Grade-Monitoring-System-For-Can-Avid-National-High-School/
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php [QSA,L]
+RewriteRule ^ index.php [QSA,L]

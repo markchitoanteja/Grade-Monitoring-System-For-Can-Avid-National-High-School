@@ -19,11 +19,11 @@ if (isset($_SESSION["user_id"])) {
 
     <title>Login - Grade Monitoring System</title>
 
-    <link rel="shortcut icon" href="assets/img/logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= base_url('public/assets/img/logo.png') ?>" type="image/x-icon">
 
-    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/login.css?v=1.0.1">
-</head>
+    <link rel="stylesheet" href="<?= base_url('public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('public/assets/css/login.css?v=1.0.1') ?>">
+</head> 
 
 <body>
     <div class="min-vh-100 d-flex align-items-center justify-content-center">
@@ -37,6 +37,7 @@ if (isset($_SESSION["user_id"])) {
             <div class="card py-3" style="width: 750px;">
                 <div class="card-body">
                     <div class="row">
+                        <!-- Login Form -->
                         <div class="col-7">
                             <h4 class="mb-3">User Login</h4>
 
@@ -57,8 +58,9 @@ if (isset($_SESSION["user_id"])) {
                                 <button type="submit" class="btn btn-primary w-100" id="login_submit">Login</button>
                             </form>
                         </div>
+                        <!-- Logo and School Name -->
                         <div class="col-5 d-flex flex-column align-items-center justify-content-center bg-light">
-                            <img src="assets/img/logo.png" alt="Logo" style="width: 100px;">
+                            <img src="<?= base_url('public/assets/img/logo.png') ?>" alt="Logo" style="width: 100px;">
                             <h3 class="mt-2 text-center"><b>Can-Avid National High School</b></h3>
                             <h4 class="mt-2 text-center">Can-Avid, Eastern Samar</h4>
                         </div>
@@ -68,9 +70,13 @@ if (isset($_SESSION["user_id"])) {
         </div>
     </div>
 
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/jquery/jquery.min.js"></script>
-    <script src="assets/js/login.js?v=1.1.0"></script>
+    <script>
+        const base_url = "<?= base_url() ?>";
+    </script>
+
+    <script src="<?= base_url('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+    <script src="<?= base_url('public/assets/vendor/jquery/jquery.min.js') ?>"></script>
+    <script src="<?= base_url('public/assets/js/login.js?v=1.1.1') ?>"></script>
 </body>
 
 </html>

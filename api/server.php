@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($is_new_image == "true") {
-            $image = upload_image("assets/img/uploads/", $image_file);
+            $image = upload_image("public/assets/img/uploads/", $image_file);
         } else {
             $image = $old_image;
         }
@@ -439,7 +439,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = $first_name . ' ' . $last_name;
             }
 
-            $image = upload_image("assets/img/uploads/", $image_file);
+            $image = upload_image("public/assets/img/uploads/", $image_file);
 
             $user_data = [
                 "uuid" => generate_uuid(),
@@ -536,7 +536,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($is_new_image == "true") {
-                $image = upload_image("assets/img/uploads/", $image_file);
+                $image = upload_image("public/assets/img/uploads/", $image_file);
             } else {
                 $image = $old_image;
             }
@@ -644,7 +644,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = $first_name . ' ' . $last_name;
             }
 
-            $image = upload_image("assets/img/uploads/", $image_file);
+            $image = upload_image("public/assets/img/uploads/", $image_file);
 
             $user_data = [
                 "uuid" => generate_uuid(),
@@ -747,7 +747,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($is_new_image == "true") {
-                $image = upload_image("assets/img/uploads/", $image_file);
+                $image = upload_image("public/assets/img/uploads/", $image_file);
             } else {
                 $image = $old_image;
             }
@@ -1074,7 +1074,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST["backup_database"])) {
-        $backup = $db->backup("backup");
+        $backup = $db->backup("public/backup");
 
         if ($backup) {
             $_SESSION["notification"] = [

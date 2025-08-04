@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-lg-12">
                                 <div class="text-center mb-3">
-                                    <img id="update_teacher_image_display" class="rounded-circle" src="assets/img/uploads/default-user-image.png" alt="User Image" style="width: 100px; height: 100px;">
+                                    <img id="update_teacher_image_display" class="rounded-circle" src="public/assets/img/uploads/default-user-image.png" alt="User Image" style="width: 100px; height: 100px;">
                                 </div>
                                 <div class="form-group">
                                     <input type="file" class="form-control-file" id="update_teacher_image" accept="image/*">

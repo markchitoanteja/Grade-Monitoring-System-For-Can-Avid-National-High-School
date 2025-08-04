@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-6 d-flex justify-content-center align-items-center bg-light">
                         <div class="text-center">
-                            <img src="assets/img/logo.png" class="mb-2" style="width: 100px; height: 100px;">
+                            <img src="<?= base_url('public/assets/img/logo.png') ?>" class="mb-2" style="width: 100px; height: 100px;">
                             <h4>Can-Avid National High School</h4>
                             <h5>Can-Avid, Eastern Samar</h5>
                         </div>
