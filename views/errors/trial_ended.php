@@ -7,8 +7,8 @@
 
     <title>Trial Period Expired</title>
 
-    <link rel="shortcut icon" href="assets/img/logo.png" type="image/x-icon">
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="<?= base_url("public/assets/img/logo.png") ?>" type="image/x-icon">
+    <link href="<?= base_url("public/assets/vendor/bootstrap/css/bootstrap.min.css") ?>" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
@@ -38,13 +38,15 @@
     </div>
 
     <script>
-        var user_id = "<?= $_SESSION["user_id"] ?>";
-        var notification = <?= isset($_SESSION["notification"]) ? json_encode($_SESSION["notification"]) : json_encode(null) ?>;
+        const base_url = "<?= base_url() ?>";
+        const user_id = "<?= $_SESSION["user_id"] ?>";
+        const notification = <?= isset($_SESSION["notification"]) ? json_encode($_SESSION["notification"]) : json_encode(null) ?>;
+        const current_page = "";
     </script>
 
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/jquery/jquery.min.js"></script>
-    <script src="assets/js/main_pages.js"></script>
+    <script src="<?= base_url("public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js") ?>"></script>
+    <script src="<?= base_url("public/assets/vendor/jquery/jquery.min.js") ?>"></script>
+    <script src="<?= base_url("public/assets/js/main_pages.js?v=1.0") ?>"></script>
 </body>
 
 </html>

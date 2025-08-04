@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Access Not Allowed - Student Grading System</title>
+    <title>Server Error - Student Grading System</title>
 
     <link rel="shortcut icon" href="<?= base_url("public/assets/img/logo.png") ?>" type="image/x-icon">
 
@@ -17,14 +17,14 @@
     <main>
         <div class="container">
 
-            <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
-                <h1 class="text-warning">403</h1>
+            <section class="section error-500 min-vh-100 d-flex flex-column align-items-center justify-content-center">
+                <h1 class="text-danger">500</h1>
 
-                <h2>Access not allowed. You do not have permission to view this page.</h2>
+                <h2>Server Error. Something went wrong on our end.</h2>
 
                 <a class="btn" href="<?= base_url() ?>">Back to home</a>
 
-                <img src="<?= base_url("public/assets/img/not-found.svg") ?>" class="img-fluid py-5" alt="Access Denied">
+                <img src="<?= base_url("public/assets/img/server-error.svg") ?>" class="img-fluid py-5" alt="Server Error">
             </section>
 
         </div>

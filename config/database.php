@@ -1,13 +1,45 @@
 <?php
+
+/**
+ * Class Database
+ * Handles database connection, table creation, CRUD operations, backup and restore functionality.
+ */
 class Database
 {
+    /**
+     * @var string $host The database host.
+     */
     private $host = 'localhost';
+
+    /**
+     * @var string $dbname The name of the database.
+     */
     private $dbname = 'u474266573_gms';
+
+    /**
+     * @var string $username The database username.
+     */
     private $username = 'u474266573_user_gms';
+
+    /**
+     * @var string $password The database password.
+     */
     private $password = 'Z;cc#>0h6|Nt';
+
+    /**
+     * @var mysqli $connection The MySQLi connection object.
+     */
     private $connection;
+
+    /**
+     * @var string $error_log_file Path to the error log file.
+     */
     private $error_log_file = "logs/error_logs.txt";
 
+    /**
+     * Database constructor.
+     * Establishes connection and initializes database/tables.
+     */
     public function __construct()
     {
         $this->connect();
@@ -24,6 +56,11 @@ class Database
         $this->insert_admin_data();
     }
 
+    /**
+     * Establishes a connection to the MySQL server.
+     *
+     * @return void
+     */
     private function connect()
     {
         $this->connection = new mysqli($this->host, $this->username, $this->password);
@@ -33,6 +70,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the database if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_database()
     {
         $sql = "CREATE DATABASE IF NOT EXISTS " . $this->dbname;
@@ -42,11 +84,21 @@ class Database
         }
     }
 
+    /**
+     * Selects the active database.
+     *
+     * @return void
+     */
     private function select_database()
     {
         $this->connection->select_db($this->dbname);
     }
 
+    /**
+     * Creates the 'users' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_users_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS users (
@@ -66,6 +118,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'students' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_students_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS students (
@@ -92,6 +149,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'teachers' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_teachers_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS teachers (
@@ -115,6 +177,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'courses' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_courses_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS courses (
@@ -132,6 +199,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'grade_components' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_grade_components_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS grade_components (
@@ -150,6 +222,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'student_grades' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_student_grades_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS student_grades (
@@ -172,6 +249,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'subjects' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_subjects_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS subjects (
@@ -194,6 +276,11 @@ class Database
         }
     }
 
+    /**
+     * Creates the 'logs' table if it doesn't exist.
+     *
+     * @return void
+     */
     private function create_logs_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS logs (
@@ -210,6 +297,11 @@ class Database
         }
     }
 
+    /**
+     * Inserts default administrator data if not present.
+     *
+     * @return void
+     */
     private function insert_admin_data()
     {
         $is_admin_exists = $this->select_one("users", "id", "1");
@@ -230,11 +322,22 @@ class Database
         }
     }
 
+    /**
+     * Generates a random UUID.
+     *
+     * @return string
+     */
     private function generate_uuid()
     {
         return bin2hex(random_bytes(16));
     }
 
+    /**
+     * Determines parameter types for prepared statements.
+     *
+     * @param array $data
+     * @return string
+     */
     private function getParamTypes($data)
     {
         return implode('', array_map(function ($value) {
@@ -242,11 +345,24 @@ class Database
         }, $data));
     }
 
+    /**
+     * Gets the last inserted ID.
+     *
+     * @return int
+     */
     public function get_last_insert_id()
     {
         return $this->connection->insert_id;
     }
 
+    /**
+     * Selects a single row from a table based on a condition.
+     *
+     * @param string $table
+     * @param string $condition_column
+     * @param mixed $condition_value
+     * @return array|null
+     */
     public function select_one($table, $condition_column, $condition_value)
     {
         $sql = "SELECT * FROM $table WHERE $condition_column = ? LIMIT 1";
@@ -256,6 +372,17 @@ class Database
         return $stmt->get_result()->fetch_assoc();
     }
 
+    /**
+     * Selects multiple rows from a table based on a condition or custom SQL.
+     *
+     * @param string|null $table
+     * @param string|null $condition_column
+     * @param mixed|null $condition_value
+     * @param string|null $order_by
+     * @param string $direction
+     * @param string|null $custom_sql
+     * @return array
+     */
     public function select_many($table = null, $condition_column = null, $condition_value = null, $order_by = null, $direction = 'ASC', $custom_sql = null)
     {
         if ($custom_sql) {
@@ -280,6 +407,14 @@ class Database
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    /**
+     * Selects all rows from a table, optionally ordered.
+     *
+     * @param string $table
+     * @param string|null $order_by
+     * @param string $direction
+     * @return array
+     */
     public function select_all($table, $order_by = null, $direction = 'ASC')
     {
         $sql = "SELECT * FROM $table";
@@ -293,6 +428,13 @@ class Database
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
+    /**
+     * Inserts a row into a table.
+     *
+     * @param string $table
+     * @param array $data
+     * @return bool
+     */
     public function insert($table, $data)
     {
         try {
@@ -315,6 +457,15 @@ class Database
         }
     }
 
+    /**
+     * Updates a row in a table.
+     *
+     * @param string $table
+     * @param array $data
+     * @param string $condition_column
+     * @param mixed $condition_value
+     * @return bool
+     */
     public function update($table, $data, $condition_column, $condition_value)
     {
         try {
@@ -341,6 +492,14 @@ class Database
         }
     }
 
+    /**
+     * Deletes a row from a table.
+     *
+     * @param string $table
+     * @param string $condition_column
+     * @param mixed $condition_value
+     * @return bool
+     */
     public function delete($table, $condition_column, $condition_value)
     {
         try {
@@ -360,6 +519,12 @@ class Database
         }
     }
 
+    /**
+     * Checks if all subjects for a teacher have a total weight of 100 in grade_components.
+     *
+     * @param int $teacher_id
+     * @return bool
+     */
     public function check_subject_weight($teacher_id)
     {
         $sql = "SELECT subject_id, SUM(weight) as total_weight 
@@ -377,6 +542,12 @@ class Database
         return $stmt->num_rows > 0;
     }
 
+    /**
+     * Runs a custom SQL query and returns the result.
+     *
+     * @param string $custom_sql
+     * @return array
+     */
     public function run_custom_query($custom_sql)
     {
         $stmt = $this->connection->prepare($custom_sql);
@@ -385,6 +556,11 @@ class Database
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    /**
+     * Drops all tables in the database.
+     *
+     * @return void
+     */
     private function drop_all_tables()
     {
         $result = $this->connection->query("SHOW TABLES");
@@ -410,6 +586,12 @@ class Database
         }
     }
 
+    /**
+     * Creates a backup of the database structure and data.
+     *
+     * @param string|null $backupDir Directory to save backup file.
+     * @return string|null Path to the backup file, or null if failed.
+     */
     public function backup($backupDir = null)
     {
         $backupDir = $backupDir ?? __DIR__;
@@ -460,6 +642,12 @@ class Database
         }
     }
 
+    /**
+     * Restores the database from a backup file.
+     *
+     * @param string $file_path Path to the backup file.
+     * @return bool
+     */
     public function restore($file_path)
     {
         if (file_exists($file_path)) {

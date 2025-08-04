@@ -7,10 +7,10 @@
 
     <title>Page Not Found - Student Grading System</title>
 
-    <link rel="shortcut icon" href="assets/img/logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="<?= base_url("public/assets/img/logo.png") ?>" type="image/x-icon">
 
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url("public/assets/vendor/bootstrap/css/bootstrap.min.css") ?>" rel="stylesheet">
+    <link href="<?= base_url("public/assets/css/style.css") ?>" rel="stylesheet">
 </head>
 
 <body>
@@ -22,9 +22,9 @@
                 
                 <h2>The page you are looking for doesn't exist.</h2>
                 
-                <a class="btn" href="/">Back to home</a>
+                <a class="btn" href="<?= base_url() ?>">Back to home</a>
 
-                <img src="assets/img/not-found.svg" class="img-fluid py-5" alt="Page Not Found">
+                <img src="<?= base_url("public/assets/img/not-found.svg") ?>" class="img-fluid py-5" alt="Page Not Found">
             </section>
 
         </div>
