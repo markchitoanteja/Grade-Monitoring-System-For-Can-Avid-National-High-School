@@ -1,8 +1,42 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_datetime = date("Y-m-d H:i:s");
 
     $db = new Database();
+
+    function send_email($receiver_email, $receiver_name, $subject, $body)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'cnhs.official2025@gmail.com';
+            $mail->Password   = 'wzyqcaauzngvdxyb';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+
+            $mail->setFrom('cnhs.official2025@gmail.com', 'Can-Avid National High School');
+            $mail->addAddress($receiver_email, $receiver_name);
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+
+            $mail->send();
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 
     function upload_image($target_directory, $image_file)
     {
@@ -300,54 +334,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = $first_name . ' ' . $last_name;
             }
 
-            if ($image_file) {
-                $image = upload_image("public/assets/img/uploads/", $image_file);
+            $username = $lrn;
+            $password = $last_name . "@2025";
+
+            $receiver_email = $email;
+            $receiver_name = $name;
+            $subject = 'Your Student Account Credentials';
+            $body = '
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <meta charset="UTF-8">
+                <title>Account Details</title>
+                </head>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background: #ffffff; border: 1px solid #dddddd; padding: 30px; border-radius: 6px;">
+                    <h2 style="color: #333333;">Welcome to Your Student Portal</h2>
+
+                    <p>Dear ' . htmlspecialchars($name) . ',</p>
+
+                    <p>We are pleased to inform you that your account has been successfully created. Below are your login credentials:</p>
+
+                    <table style="border-collapse: collapse; width: 100%; margin-top: 20px; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #dddddd; background-color: #f2f2f2;"><strong>Username:</strong></td>
+                        <td style="padding: 10px; border: 1px solid #dddddd;">' . htmlspecialchars($username) . '</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #dddddd; background-color: #f2f2f2;"><strong>Password:</strong></td>
+                        <td style="padding: 10px; border: 1px solid #dddddd;">' . htmlspecialchars($password) . '</td>
+                    </tr>
+                    </table>
+
+                    <p>For security purposes, please make sure to change your password after your first login.</p>
+
+                    <p>If you have any questions or need assistance, do not hesitate to contact our support team.</p>
+
+                    <p>Best regards,<br>
+                    <strong>Your School IT Support</strong></p>
+                </div>
+                </body>
+                </html>
+            ';
+
+            if (send_email($receiver_email, $receiver_name, $subject, $body)) {
+                if ($image_file) {
+                    $image = upload_image("public/assets/img/uploads/", $image_file);
+                } else {
+                    $image = "default-user-image.png";
+                }
+
+                $user_data = [
+                    "uuid" => generate_uuid(),
+                    "name" => $name,
+                    "username" => $lrn,
+                    "password" => password_hash($lrn, PASSWORD_BCRYPT),
+                    "image" => $image,
+                    "user_type" => "student",
+                    "created_at" => $current_datetime,
+                    "updated_at" => $current_datetime,
+                ];
+
+                $db->insert("users", $user_data);
+
+                $account_id = $db->get_last_insert_id();
+
+                $students_data = [
+                    "uuid" => generate_uuid(),
+                    "account_id" => $account_id,
+                    "lrn" => $lrn,
+                    "strand_id" => $strand_id,
+                    "grade_level" => $grade_level,
+                    "section" => $section,
+                    "first_name" => $first_name,
+                    "middle_name" => $middle_name,
+                    "last_name" => $last_name,
+                    "birthday" => $birthday,
+                    "sex" => $sex,
+                    "email" => $email,
+                    "address" => $address,
+                    "created_at" => $current_datetime,
+                    "updated_at" => $current_datetime,
+                ];
+
+                $db->insert("students", $students_data);
+
+                $_SESSION["notification"] = [
+                    "title" => "Success!",
+                    "text" => "A student has been added successfully.",
+                    "icon" => "success",
+                ];
+
+                insert_log($_SESSION["user_id"], "A student has been added successfully.");
             } else {
-                $image = "default-user-image.png";
+                $_SESSION["notification"] = [
+                    "title" => "Oops...",
+                    "text" => "Failed to send email to the student. Data is not saved.",
+                    "icon" => "error",
+                ];
             }
-
-            $user_data = [
-                "uuid" => generate_uuid(),
-                "name" => $name,
-                "username" => $lrn,
-                "password" => password_hash($lrn, PASSWORD_BCRYPT),
-                "image" => $image,
-                "user_type" => "student",
-                "created_at" => $current_datetime,
-                "updated_at" => $current_datetime,
-            ];
-
-            $db->insert("users", $user_data);
-
-            $account_id = $db->get_last_insert_id();
-
-            $teacher_data = [
-                "uuid" => generate_uuid(),
-                "account_id" => $account_id,
-                "lrn" => $lrn,
-                "strand_id" => $strand_id,
-                "grade_level" => $grade_level,
-                "section" => $section,
-                "first_name" => $first_name,
-                "middle_name" => $middle_name,
-                "last_name" => $last_name,
-                "birthday" => $birthday,
-                "sex" => $sex,
-                "email" => $email,
-                "address" => $address,
-                "created_at" => $current_datetime,
-                "updated_at" => $current_datetime,
-            ];
-
-            $db->insert("students", $teacher_data);
-
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A student has been added successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "A student has been added successfully.");
         }
 
         echo json_encode($response);
