@@ -76,7 +76,7 @@ if (isset($_SESSION["user_id"])) {
 
     <script src="<?= base_url('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= base_url('public/assets/vendor/jquery/jquery.min.js') ?>"></script>
-    <script src="<?= base_url('public/assets/js/login.js?v=1.1.2') ?>"></script>
+    <script src="<?= base_url('public/assets/js/login.js?v=1.1.3') ?>"></script>
 </body>
 
 </html>
