@@ -13,31 +13,30 @@
                     </div>
                     <div class="actual-form">
                         <div class="row mb-3">
-                            <div class="col-lg-12">
-                                <div class="text-center mb-3">
-                                    <img id="new_student_image_display" class="rounded-circle" src="public/assets/img/uploads/default-user-image.png" alt="User Image" style="width: 100px; height: 100px;">
+                            <div class="col-lg-12 d-flex flex-column align-items-center">
+                                <div class="mb-2">
+                                    <img id="new_student_image_display" src="<?= base_url('public/assets/img/uploads/default-user-image.png') ?>" alt="User Image" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #dee2e6;">
                                 </div>
-                                <div class="form-group">
-                                    <input type="file" class="form-control-file" id="new_student_image" accept="image/*" required>
-                                </div>
+                                <label for="new_student_image" style="background-color: #0d6efd; color: white; padding: 8px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#0b5ed7'" onmouseout="this.style.backgroundColor='#0d6efd'">Upload Photo</label>
+                                <input type="file" id="new_student_image" accept="image/*" style="display: none;">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="new_student_student_number">Student Number</label>
-                                    <input type="text" class="form-control" id="new_student_student_number" required>
-                                    <small class="text-danger d-none" id="error_new_student_student_number">Student Number is already in use!</small>
+                                    <label for="new_student_lrn">Learner Reference Number</label>
+                                    <input type="text" class="form-control" id="new_student_lrn" required>
+                                    <small class="text-danger d-none" id="error_new_student_lrn">LRN is already in use!</small>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="new_student_course">Course</label>
-                                    <select id="new_student_course" class="form-select" required>
+                                    <label for="new_student_strand_id">Strand</label>
+                                    <select id="new_student_strand_id" class="form-select" required>
                                         <option value selected disabled></option>
-                                        <?php if ($courses = $db->select_all("courses", "code", "ASC")): ?>
-                                            <?php foreach ($courses as $course): ?>
-                                                <option value="<?= $course["code"] ?>"><?= $course["description"] ?></option>
+                                        <?php if ($strand = $db->select_all("strands", "code", "ASC")): ?>
+                                            <?php foreach ($strands as $strand): ?>
+                                                <option value="<?= $strand["id"] ?>"><?= $strand["code"] ?></option>
                                             <?php endforeach ?>
                                         <?php endif ?>
                                     </select>
@@ -45,9 +44,11 @@
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label for="new_student_year">Year</label>
-                                    <select id="new_student_year" class="form-select" required disabled>
-                                        <!-- Data from AJAX -->
+                                    <label for="new_student_grade_level">Grade Level</label>
+                                    <select id="new_student_grade_level" class="form-select" required>
+                                        <option value selected disabled></option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
                                     </select>
                                 </div>
                             </div>
@@ -87,14 +88,19 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="new_student_mobile_number">Mobile Number</label>
-                                    <input type="number" class="form-control" id="new_student_mobile_number" required>
+                                    <label for="new_student_sex">Sex</label>
+                                    <select class="form-select" id="new_student_sex" required>
+                                        <option value selected disabled></option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="new_student_email">Email</label>
                                     <input type="email" class="form-control" id="new_student_email" required>
+                                    <small class="text-danger d-none" id="error_new_student_email">Email is already in use!</small>
                                 </div>
                             </div>
                         </div>
@@ -103,28 +109,6 @@
                                 <div class="form-group">
                                     <label for="new_student_address">Address</label>
                                     <textarea id="new_student_address" class="form-control" rows="3"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label for="new_student_username">Username</label>
-                                    <input type="text" class="form-control" id="new_student_username" required>
-                                    <small class="text-danger d-none" id="error_new_student_username">Username is already in use!</small>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label for="new_student_password">Password</label>
-                                    <input type="password" class="form-control" id="new_student_password" required>
-                                    <small class="text-danger d-none" id="error_new_student_password">Passwords do not matched!</small>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label for="new_student_confirm_password">Confirm Password</label>
-                                    <input type="password" class="form-control" id="new_student_confirm_password" required>
                                 </div>
                             </div>
                         </div>

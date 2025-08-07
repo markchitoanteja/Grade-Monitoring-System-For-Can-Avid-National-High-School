@@ -39,11 +39,13 @@ function get_initials($first_name)
 
     <link rel="shortcut icon" href="<?= base_url('public/assets/img/logo.png') ?>" type="image/x-icon">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <link href="<?= base_url('public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
     <link href="<?= base_url('public/assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
     <link href="<?= base_url('public/assets/vendor/simple-datatables/style.css') ?>" rel="stylesheet">
     <link href="<?= base_url('public/assets/vendor/sweetalert2/css/sweetalert2.min.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('public/assets/css/style.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('public/assets/css/style.css?v=1.0') ?>" rel="stylesheet">
 </head>
 
 <body>
@@ -59,9 +61,11 @@ function get_initials($first_name)
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
                 <li class="nav-item dropdown pe-3">
-                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="<?= base_url('public/assets/img/uploads/') ?><?= $user_data["image"] ?>" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
-                        <span class="d-none d-md-block dropdown-toggle ps-2"><?= $_SESSION["user_type"] != "admin" ? get_initials($teacher_student_data["first_name"]) . " " . $teacher_student_data["last_name"] : $user_data["name"] ?></span>
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown" aria-label="User profile dropdown">
+                        <img src="<?= base_url('public/assets/img/uploads/' . $user_data['image']) ?>" alt="Profile" class="rounded-circle" style="width: 35px; height: 35px;">
+                        <span class="d-none d-md-block dropdown-toggle ps-2">
+                            <?= $_SESSION["user_type"] !== "admin" ? get_initials($teacher_student_data["first_name"]) . " " . $teacher_student_data["last_name"] : $user_data["name"] ?>
+                        </span>
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -69,6 +73,7 @@ function get_initials($first_name)
                             <h6><?= $user_data["name"] ?></h6>
                             <span><?= ucfirst($user_data["user_type"]) ?></span>
                         </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -79,6 +84,7 @@ function get_initials($first_name)
                                 <span>Account Settings</span>
                             </a>
                         </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -89,6 +95,7 @@ function get_initials($first_name)
                                 <span>About Us</span>
                             </a>
                         </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -99,7 +106,6 @@ function get_initials($first_name)
                                 <span>Sign Out</span>
                             </a>
                         </li>
-
                     </ul>
                 </li>
             </ul>
@@ -108,86 +114,53 @@ function get_initials($first_name)
 
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
+            <!-- Admin Tabs -->
             <?php if ($_SESSION["user_type"] == "admin"): ?>
                 <!-- Dashboard -->
                 <li class="nav-item">
                     <a class="nav-link <?= $current_page != "dashboard" ? "collapsed" : null ?>" href="dashboard">
-                        <i class="bi bi-grid-fill"></i>
+                        <i class="bi bi-grid"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
-                <!-- Courses -->
+                <!-- Strands -->
                 <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "courses" ? "collapsed" : null ?>" href="courses">
-                        <i class="bi bi-journal-bookmark-fill"></i>
-                        <span>Courses</span>
+                    <a class="nav-link <?= $current_page != "strands" ? "collapsed" : null ?>" href="strands">
+                        <i class="bi bi-diagram-3"></i>
+                        <span>Strands</span>
+                    </a>
+                </li>
+                
+                <!-- Students -->
+                <li class="nav-item">
+                    <a class="nav-link <?= $current_page != "students" ? "collapsed" : null ?>" href="students">
+                        <i class="bi bi-people"></i>
+                        <span>Students</span>
                     </a>
                 </li>
 
                 <!-- Subjects -->
                 <li class="nav-item">
                     <a class="nav-link <?= $current_page != "subjects" ? "collapsed" : null ?>" href="subjects">
-                        <i class="bi bi-book-fill"></i>
+                        <i class="bi bi-book"></i>
                         <span>Subjects</span>
                     </a>
                 </li>
-
-                <!-- Teachers -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "teachers" ? "collapsed" : null ?>" href="teachers">
-                        <i class="bi bi-person-badge-fill"></i>
-                        <span>Teachers</span>
-                    </a>
-                </li>
-
-                <!-- Students -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "students" ? "collapsed" : null ?>" href="students">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Students</span>
-                    </a>
-                </li>
                 
+                <!-- Grades -->
+                <li class="nav-item">
+                    <a class="nav-link <?= $current_page != "grades" ? "collapsed" : null ?>" href="grades">
+                        <i class="bi bi-bar-chart"></i>
+                        <span>Grades</span>
+                    </a>
+                </li>
+
                 <!-- Backup and Restore -->
                 <li class="nav-item">
                     <a class="nav-link <?= $current_page != "backup_and_restore" ? "collapsed" : null ?>" href="backup_and_restore">
                         <i class="bi bi-database"></i>
                         <span>Backup and Restore</span>
-                    </a>
-                </li>
-            <?php endif ?>
-
-            <?php if ($_SESSION["user_type"] == "teacher"): ?>
-                <!-- Grade Components -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "grade_components" ? "collapsed" : null ?>" href="grade_components">
-                        <i class="bi bi-pie-chart-fill"></i>
-                        <span>Grade Components</span>
-                    </a>
-                </li>
-                <!-- Grades Entry -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "grade_entries" ? "collapsed" : null ?>" href="grade_entries">
-                        <i class="bi bi-pencil-fill"></i>
-                        <span>Grade Entries</span>
-                    </a>
-                </li>
-                <!-- Student Grades-->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "student_grades" ? "collapsed" : null ?>" href="student_grades">
-                        <i class="bi bi-bar-chart-fill"></i>
-                        <span>Student Grades</span>
-                    </a>
-                </li>
-            <?php endif ?>
-
-            <?php if ($_SESSION["user_type"] == "student"): ?>
-                <!-- My Grades -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "my_grades" ? "collapsed" : null ?>" href="my_grades">
-                        <i class="bi bi-journal-text"></i>
-                        <span>My Grades</span>
                     </a>
                 </li>
             <?php endif ?>

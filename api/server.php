@@ -89,93 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($user_data);
     }
 
-    if (isset($_POST["get_course_data"])) {
-        $id = $_POST["id"];
-
-        $course_data = $db->select_one("courses", "id", $id);
-
-        echo json_encode($course_data);
-    }
-
-    if (isset($_POST["get_course_data_by_code"])) {
-        $code = $_POST["code"];
-
-        $course_data = $db->select_one("courses", "code", $code);
-
-        echo json_encode($course_data);
-    }
-
-    if (isset($_POST["get_student_data_by_account_id"])) {
-        $account_id = $_POST["account_id"];
-
-        $student_data = $db->select_one("students", "account_id", $account_id);
-
-        echo json_encode($student_data);
-    }
-
-    if (isset($_POST["get_subjects"])) {
-        $course = $_POST["course"];
-        $year = $_POST["year"];
-        $semester = $_POST["semester"];
-
-        $sql = "SELECT id, description FROM subjects WHERE course='" . $course . "' AND year='" . $year . "' AND semester='" . $semester . "'";
-        $subjects = $db->select_many(null, null, null, null, null, $sql);
-
-        echo json_encode($subjects);
-    }
-
-    if (isset($_POST["get_subject_data"])) {
-        $id = $_POST["id"];
-
-        $subject_data = $db->select_one("subjects", "id", $id);
-
-        echo json_encode($subject_data);
-    }
-
-    if (isset($_POST["get_teacher_data"])) {
-        $id = $_POST["id"];
-
-        $user_data = $db->select_one("users", "id", $id);
-        $teacher_data = $db->select_one("teachers", "account_id", $id);
-
-        echo json_encode(array_merge($user_data, $teacher_data));
-    }
-
-    if (isset($_POST["get_student_data"])) {
-        $id = $_POST["id"];
-
-        $user_data = $db->select_one("users", "id", $id);
-        $student_data = $db->select_one("students", "account_id", $id);
-
-        echo json_encode(array_merge($user_data, $student_data));
-    }
-
-    if (isset($_POST["get_grade_component_data"])) {
-        $id = $_POST["id"];
-
-        $grade_component_data = $db->select_one("grade_components", "id", $id);
-
-        echo json_encode($grade_component_data);
-    }
-
-    if (isset($_POST["get_grade_component_data_by_teacher_id_and_subject_id"])) {
-        $teacher_id = $_POST["teacher_id"];
-        $subject_id = $_POST["subject_id"];
-
-        $sql = "SELECT * FROM grade_components WHERE teacher_id='" . $teacher_id . "' AND subject_id='" . $subject_id . "'";
-        $grade_component_data = $db->run_custom_query($sql);
-
-        echo json_encode($grade_component_data);
-    }
-
-    if (isset($_POST["get_student_grade_data"])) {
-        $id = $_POST["id"];
-
-        $student_grade_data = $db->select_one("student_grades", "id", $id);
-
-        echo json_encode($student_grade_data);
-    }
-
     if (isset($_POST["update_admin_account"])) {
         $id = $_POST["id"];
         $name = $_POST["name"];
@@ -224,413 +137,156 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($response);
     }
 
-    if (isset($_POST["new_course"])) {
-        $code = $_POST["code"];
-        $description = $_POST["description"];
-        $years = $_POST["years"];
+    if (isset($_POST["get_strand_data"])) {
+        $id = $_POST["id"];
 
         $response = false;
 
-        $data = [
-            "uuid" => generate_uuid(),
-            "code" => $code,
-            "description" => $description,
-            "years" => $years,
-            "created_at" => $current_datetime,
-            "updated_at" => $current_datetime,
-        ];
+        $strand_data = $db->select_one("strands", "id", $id);
 
-        if ($db->insert("courses", $data)) {
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A course has been added successfully.",
-                "icon" => "success",
+        if ($strand_data) {
+            $response = [
+                "id" => $strand_data["id"],
+                "code" => $strand_data["code"],
+                "name" => $strand_data["name"],
+                "description" => $strand_data["description"],
             ];
-
-            insert_log($_SESSION["user_id"], "A course has been added successfully.");
-
-            $response = true;
         }
 
         echo json_encode($response);
     }
 
-    if (isset($_POST["update_course"])) {
-        $id = $_POST["id"];
+    if (isset($_POST["new_strand"])) {
         $code = $_POST["code"];
+        $name = $_POST["name"];
         $description = $_POST["description"];
-        $years = $_POST["years"];
 
         $response = false;
 
-        $data = [
-            "code" => $code,
-            "description" => $description,
-            "years" => $years,
-            "updated_at" => $current_datetime,
-        ];
-
-        if ($db->update("courses", $data, "id", $id)) {
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A course has been updated successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "A course has been updated successfully.");
-
-            $response = true;
-        }
-
-        echo json_encode($response);
-    }
-
-    if (isset($_POST["delete_course"])) {
-        $id = $_POST["id"];
-
-        $db->delete("courses", "id", $id);
-
-        $_SESSION["notification"] = [
-            "title" => "Success!",
-            "text" => "A course has been deleted successfully.",
-            "icon" => "success",
-        ];
-
-        insert_log($_SESSION["user_id"], "A course has been deleted successfully.");
-
-        echo json_encode(true);
-    }
-
-    if (isset($_POST["new_subject"])) {
-        $code = $_POST["code"];
-        $description = $_POST["description"];
-        $lecture_units = $_POST["lecture_units"];
-        $laboratory_units = $_POST["laboratory_units"];
-        $hours_per_week = $_POST["hours_per_week"];
-        $course = $_POST["course"];
-        $year = $_POST["year"];
-        $semester = $_POST["semester"];
-
-        $response = false;
-
-        $data = [
-            "uuid" => generate_uuid(),
-            "code" => $code,
-            "description" => $description,
-            "lecture_units" => $lecture_units,
-            "laboratory_units" => $laboratory_units,
-            "hours_per_week" => $hours_per_week,
-            "course" => $course,
-            "year" => $year,
-            "semester" => $semester,
-            "created_at" => $current_datetime,
-            "updated_at" => $current_datetime,
-        ];
-
-        if ($db->insert("subjects", $data)) {
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A subject has been added successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "A subject has been added successfully.");
-
-            $response = true;
-        }
-
-        echo json_encode($response);
-    }
-
-    if (isset($_POST["update_subject"])) {
-        $id = $_POST["id"];
-        $code = $_POST["code"];
-        $description = $_POST["description"];
-        $lecture_units = $_POST["lecture_units"];
-        $laboratory_units = $_POST["laboratory_units"];
-        $hours_per_week = $_POST["hours_per_week"];
-        $course = $_POST["course"];
-        $year = $_POST["year"];
-        $semester = $_POST["semester"];
-
-        $response = false;
-
-        $data = [
-            "code" => $code,
-            "description" => $description,
-            "lecture_units" => $lecture_units,
-            "laboratory_units" => $laboratory_units,
-            "hours_per_week" => $hours_per_week,
-            "course" => $course,
-            "year" => $year,
-            "semester" => $semester,
-            "updated_at" => $current_datetime,
-        ];
-
-        if ($db->update("subjects", $data, "id", $id)) {
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A subject has been updated successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "A subject has been updated successfully.");
-
-            $response = true;
-        }
-
-        echo json_encode($data);
-    }
-
-    if (isset($_POST["delete_subject"])) {
-        $id = $_POST["id"];
-
-        $db->delete("subjects", "id", $id);
-
-        $_SESSION["notification"] = [
-            "title" => "Success!",
-            "text" => "A subject has been deleted successfully.",
-            "icon" => "success",
-        ];
-
-        insert_log($_SESSION["user_id"], "A subject has been deleted successfully.");
-
-        echo json_encode(true);
-    }
-
-    if (isset($_POST["new_teacher"])) {
-        $employee_number = $_POST["employee_number"];
-        $first_name = $_POST["first_name"];
-        $middle_name = $_POST["middle_name"];
-        $last_name = $_POST["last_name"];
-        $birthday = $_POST["birthday"];
-        $mobile_number = $_POST["mobile_number"];
-        $email = $_POST["email"];
-        $address = $_POST["address"];
-        $image_file = $_FILES["image_file"];
-        $username = $_POST["username"];
-        $password = $_POST["password"];
-
-        $response = [
-            "employee_number_ok" => true,
-            "username_ok" => true,
-        ];
-
-        $is_error = false;
-
-        if ($db->select_one("teachers", "employee_number", $employee_number)) {
-            $response["employee_number_ok"] = false;
-
-            $is_error = true;
-        }
-
-        if ($db->select_one("users", "username", $username)) {
-            $response["username_ok"] = false;
-
-            $is_error = true;
-        }
-
-        if (!$is_error) {
-            if (!empty($middle_name)) {
-                $middle_initial = strtoupper(substr($middle_name, 0, 1)) . '.';
-
-                $name = $first_name . ' ' . $middle_initial . ' ' . $last_name;
-            } else {
-                $name = $first_name . ' ' . $last_name;
-            }
-
-            $image = upload_image("public/assets/img/uploads/", $image_file);
-
-            $user_data = [
+        if (!$db->select_one("strands", "code", $code)) {
+            $data = [
                 "uuid" => generate_uuid(),
+                "code" => $code,
                 "name" => $name,
-                "username" => $username,
-                "password" => password_hash($password, PASSWORD_BCRYPT),
-                "image" => $image,
-                "user_type" => "teacher",
+                "description" => $description,
                 "created_at" => $current_datetime,
                 "updated_at" => $current_datetime,
             ];
 
-            $db->insert("users", $user_data);
+            if ($db->insert("strands", $data)) {
+                $_SESSION["notification"] = [
+                    "title" => "Success!",
+                    "text" => "A new strand has been added successfully.",
+                    "icon" => "success",
+                ];
 
-            $account_id = $db->get_last_insert_id();
+                insert_log($_SESSION["user_id"], "A new strand has been added successfully.");
 
-            $teacher_data = [
-                "uuid" => generate_uuid(),
-                "account_id" => $account_id,
-                "employee_number" => $employee_number,
-                "first_name" => $first_name,
-                "middle_name" => $middle_name,
-                "last_name" => $last_name,
-                "birthday" => $birthday,
-                "mobile_number" => $mobile_number,
-                "email" => $email,
-                "address" => $address,
-                "created_at" => $current_datetime,
-                "updated_at" => $current_datetime,
-            ];
-
-            $db->insert("teachers", $teacher_data);
-
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A teacher has been added successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "A teacher has been added successfully.");
+                $response = true;
+            }
         }
 
         echo json_encode($response);
     }
 
-    if (isset($_POST["update_teacher"])) {
-        $employee_number = $_POST["employee_number"];
-        $first_name = $_POST["first_name"];
-        $middle_name = $_POST["middle_name"];
-        $last_name = $_POST["last_name"];
-        $birthday = $_POST["birthday"];
-        $mobile_number = $_POST["mobile_number"];
-        $email = $_POST["email"];
-        $address = $_POST["address"];
-        $image_file = isset($_FILES["image_file"]) ? $_FILES["image_file"] : null;
-        $username = $_POST["username"];
-        $password = $_POST["password"];
+    if (isset($_POST["update_strand"])) {
+        $id = $_POST["id"];
+        $code = $_POST["code"];
+        $name = $_POST["name"];
+        $description = $_POST["description"];
 
+        $response = false;
+
+        $data = [
+            "code" => $code,
+            "name" => $name,
+            "description" => $description,
+            "updated_at" => $current_datetime,
+        ];
+
+        if ($db->update("strands", $data, "id", $id)) {
+            $_SESSION["notification"] = [
+                "title" => "Success!",
+                "text" => "A strand has been updated successfully.",
+                "icon" => "success",
+            ];
+
+            insert_log($_SESSION["user_id"], "A strand has been updated successfully.");
+
+            $response = true;
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["delete_strand"])) {
+        $id = $_POST["id"];
+
+        $response = false;
+
+        if ($db->delete("strands", "id", $id)) {
+            $_SESSION["notification"] = [
+                "title" => "Success!",
+                "text" => "A strand has been deleted successfully.",
+                "icon" => "success",
+            ];
+
+            insert_log($_SESSION["user_id"], "A strand has been deleted successfully.");
+
+            $response = true;
+        } else {
+            $_SESSION["notification"] = [
+                "title" => "Oops...",
+                "text" => "Failed to delete the strand.",
+                "icon" => "error",
+            ];
+
+            $response = true;
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["get_student_data"])) {
         $account_id = $_POST["account_id"];
-        $old_image = $_POST["old_image"];
-        $old_password = $_POST["old_password"];
-        $old_employee_number = $_POST["old_employee_number"];
-        $old_username = $_POST["old_username"];
 
-        $is_new_image = $_POST["is_new_image"];
-        $is_new_password = $_POST["is_new_password"];
+        $student_data = $db->select_one("students", "account_id", $account_id);
+        $image = $db->select_one("users", "id", $account_id)["image"];
 
-        $response = [
-            "employee_number_ok" => true,
-            "username_ok" => true,
-        ];
+        $student_data["image"] = $image;
 
-        $is_error = false;
-
-        if (($employee_number != $old_employee_number) && ($db->select_one("teachers", "employee_number", $employee_number))) {
-            $response["employee_number_ok"] = false;
-
-            $is_error = true;
-        }
-
-        if (($username != $old_username) && ($db->select_one("users", "username", $username))) {
-            $response["username_ok"] = false;
-
-            $is_error = true;
-        }
-
-        if (!$is_error) {
-            if (!empty($middle_name)) {
-                $middle_initial = strtoupper(substr($middle_name, 0, 1)) . '.';
-
-                $name = $first_name . ' ' . $middle_initial . ' ' . $last_name;
-            } else {
-                $name = $first_name . ' ' . $last_name;
-            }
-
-            if ($is_new_image == "true") {
-                $image = upload_image("public/assets/img/uploads/", $image_file);
-            } else {
-                $image = $old_image;
-            }
-
-            if ($is_new_password == "true") {
-                $password = password_hash($password, PASSWORD_BCRYPT);
-            } else {
-                $password = $old_password;
-            }
-
-            $user_data = [
-                "name" => $name,
-                "username" => $username,
-                "password" => $password,
-                "image" => $image,
-                "updated_at" => $current_datetime,
-            ];
-
-            $db->update("users", $user_data, "id", $account_id);
-
-            $teacher_data = [
-                "employee_number" => $employee_number,
-                "first_name" => $first_name,
-                "middle_name" => $middle_name,
-                "last_name" => $last_name,
-                "birthday" => $birthday,
-                "mobile_number" => $mobile_number,
-                "email" => $email,
-                "address" => $address,
-                "updated_at" => $current_datetime,
-            ];
-
-            $db->update("teachers", $teacher_data, "account_id", $account_id);
-
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "A teacher has been updated successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "A teacher has been updated successfully.");
-        }
-
-        echo json_encode($response);
-    }
-
-    if (isset($_POST["delete_teacher"])) {
-        $id = $_POST["id"];
-
-        $db->delete("users", "id", $id);
-        $db->delete("teachers", "account_id", $id);
-
-        $_SESSION["notification"] = [
-            "title" => "Success!",
-            "text" => "A teacher has been deleted successfully.",
-            "icon" => "success",
-        ];
-
-        insert_log($_SESSION["user_id"], "A teacher has been deleted successfully.");
-
-        echo json_encode(true);
+        echo json_encode($student_data);
     }
 
     if (isset($_POST["new_student"])) {
-        $student_number = $_POST["student_number"];
-        $course = $_POST["course"];
-        $year = $_POST["year"];
+        $lrn = $_POST["lrn"];
+        $strand_id = $_POST["strand_id"];
+        $grade_level = $_POST["grade_level"];
         $section = $_POST["section"];
         $first_name = $_POST["first_name"];
         $middle_name = $_POST["middle_name"];
         $last_name = $_POST["last_name"];
         $birthday = $_POST["birthday"];
-        $mobile_number = $_POST["mobile_number"];
+        $sex = $_POST["sex"];
         $email = $_POST["email"];
         $address = $_POST["address"];
-        $image_file = $_FILES["image_file"];
-        $username = $_POST["username"];
-        $password = $_POST["password"];
+        $image_file = isset($_FILES["image_file"]) ? $_FILES["image_file"] : null;
 
         $response = [
-            "student_number_ok" => true,
-            "username_ok" => true,
+            "lrn_ok" => true,
+            "email_ok" => true,
         ];
 
         $is_error = false;
 
-        if ($db->select_one("students", "student_number", $student_number)) {
-            $response["student_number_ok"] = false;
+        if ($db->select_one("students", "lrn", $lrn)) {
+            $response["lrn_ok"] = false;
 
             $is_error = true;
         }
 
-        if ($db->select_one("users", "username", $username)) {
-            $response["username_ok"] = false;
+        if ($db->select_one("students", "email", $email)) {
+            $response["email_ok"] = false;
 
             $is_error = true;
         }
@@ -644,13 +300,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = $first_name . ' ' . $last_name;
             }
 
-            $image = upload_image("public/assets/img/uploads/", $image_file);
+            if ($image_file) {
+                $image = upload_image("public/assets/img/uploads/", $image_file);
+            } else {
+                $image = "default-user-image.png";
+            }
 
             $user_data = [
                 "uuid" => generate_uuid(),
                 "name" => $name,
-                "username" => $username,
-                "password" => password_hash($password, PASSWORD_BCRYPT),
+                "username" => $lrn,
+                "password" => password_hash($lrn, PASSWORD_BCRYPT),
                 "image" => $image,
                 "user_type" => "student",
                 "created_at" => $current_datetime,
@@ -664,15 +324,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $teacher_data = [
                 "uuid" => generate_uuid(),
                 "account_id" => $account_id,
-                "student_number" => $student_number,
-                "course" => $course,
-                "year" => $year,
+                "lrn" => $lrn,
+                "strand_id" => $strand_id,
+                "grade_level" => $grade_level,
                 "section" => $section,
                 "first_name" => $first_name,
                 "middle_name" => $middle_name,
                 "last_name" => $last_name,
                 "birthday" => $birthday,
-                "mobile_number" => $mobile_number,
+                "sex" => $sex,
                 "email" => $email,
                 "address" => $address,
                 "created_at" => $current_datetime,
@@ -694,45 +354,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST["update_student"])) {
-        $student_number = $_POST["student_number"];
-        $course = $_POST["course"];
-        $year = $_POST["year"];
+        $account_id = $_POST["account_id"];
+        $old_image = $_POST["old_image"];
+        $lrn = $_POST["lrn"];
+        $strand_id = $_POST["strand_id"];
+        $grade_level = $_POST["grade_level"];
         $section = $_POST["section"];
         $first_name = $_POST["first_name"];
         $middle_name = $_POST["middle_name"];
         $last_name = $_POST["last_name"];
         $birthday = $_POST["birthday"];
-        $mobile_number = $_POST["mobile_number"];
+        $sex = $_POST["sex"];
         $email = $_POST["email"];
         $address = $_POST["address"];
         $image_file = isset($_FILES["image_file"]) ? $_FILES["image_file"] : null;
-        $username = $_POST["username"];
-        $password = $_POST["password"];
-
-        $account_id = $_POST["account_id"];
-        $old_image = $_POST["old_image"];
-        $old_password = $_POST["old_password"];
-        $old_student_number = $_POST["old_student_number"];
-        $old_username = $_POST["old_username"];
-
-        $is_new_image = $_POST["is_new_image"];
-        $is_new_password = $_POST["is_new_password"];
 
         $response = [
-            "student_number_ok" => true,
-            "username_ok" => true,
+            "lrn_ok" => true,
+            "email_ok" => true,
         ];
 
         $is_error = false;
 
-        if (($student_number != $old_student_number) && ($db->select_one("students", "student_number", $student_number))) {
-            $response["student_number_ok"] = false;
+        if ($db->run_custom_query("SELECT id FROM students WHERE lrn = '$lrn' AND account_id != '$account_id'")) {
+            $response["lrn_ok"] = false;
 
             $is_error = true;
         }
 
-        if (($username != $old_username) && ($db->select_one("users", "username", $username))) {
-            $response["username_ok"] = false;
+        if ($db->run_custom_query("SELECT id FROM students WHERE email = '$email' AND account_id != '$account_id'")) {
+            $response["email_ok"] = false;
 
             $is_error = true;
         }
@@ -746,44 +397,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = $first_name . ' ' . $last_name;
             }
 
-            if ($is_new_image == "true") {
+            if ($image_file) {
                 $image = upload_image("public/assets/img/uploads/", $image_file);
             } else {
                 $image = $old_image;
             }
 
-            if ($is_new_password == "true") {
-                $password = password_hash($password, PASSWORD_BCRYPT);
-            } else {
-                $password = $old_password;
-            }
-
             $user_data = [
                 "name" => $name,
-                "username" => $username,
-                "password" => $password,
                 "image" => $image,
+                "created_at" => $current_datetime,
                 "updated_at" => $current_datetime,
             ];
 
             $db->update("users", $user_data, "id", $account_id);
 
-            $student_data = [
-                "student_number" => $student_number,
-                "course" => $course,
-                "year" => $year,
+            $students_data = [
+                "lrn" => $lrn,
+                "strand_id" => $strand_id,
+                "grade_level" => $grade_level,
                 "section" => $section,
                 "first_name" => $first_name,
                 "middle_name" => $middle_name,
                 "last_name" => $last_name,
                 "birthday" => $birthday,
-                "mobile_number" => $mobile_number,
+                "sex" => $sex,
                 "email" => $email,
                 "address" => $address,
                 "updated_at" => $current_datetime,
             ];
 
-            $db->update("students", $student_data, "account_id", $account_id);
+            $db->update("students", $students_data, "account_id", $account_id);
 
             $_SESSION["notification"] = [
                 "title" => "Success!",
@@ -798,277 +442,176 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST["delete_student"])) {
-        $id = $_POST["id"];
+        $account_id = $_POST["account_id"];
 
-        $db->delete("users", "id", $id);
-        $db->delete("students", "account_id", $id);
+        $response = false;
 
-        $_SESSION["notification"] = [
-            "title" => "Success!",
-            "text" => "A student has been deleted successfully.",
-            "icon" => "success",
-        ];
+        if ($db->delete("students", "account_id", $account_id)) {
+            $db->delete("users", "id", $account_id);
 
-        insert_log($_SESSION["user_id"], "A student has been deleted successfully.");
+            $_SESSION["notification"] = [
+                "title" => "Success!",
+                "text" => "A student has been deleted successfully.",
+                "icon" => "success",
+            ];
 
-        echo json_encode(true);
+            $response = true;
+
+            insert_log($_SESSION["user_id"], "A student has been deleted successfully.");
+        }
+
+        echo json_encode($response);
     }
 
-    if (isset($_POST["new_grade_component"])) {
-        $subject_id = $_POST["subject_id"];
-        $teacher_id = $_POST["teacher_id"];
-        $component = $_POST["component"];
-        $weight = $_POST["weight"];
+    if (isset($_POST["get_subject_data"])) {
+        $id = $_POST["id"];
 
-        $response = [
-            "component_ok" => true,
-            "weight_ok" => true,
-        ];
+        $response = $db->select_one("subjects", "id", $id);
 
-        $sql = "SELECT SUM(weight) AS current_weight_sum FROM grade_components WHERE subject_id = '" . $subject_id . "' GROUP BY subject_id";
-        $current_weight_sum = $db->run_custom_query($sql);
+        echo json_encode($response);
+    }
 
-        if ($current_weight_sum && intval($current_weight_sum[0]["current_weight_sum"]) + $weight > 100) {
-            $response["weight_ok"] = false;
+    if (isset($_POST["new_subject"])) {
+        $name = $_POST["name"];
+        $category = $_POST["category"];
+        $grade_level = $_POST["grade_level"];
+        $strand_id = $_POST["strand_id"];
+
+        $response = false;
+
+        if (strtolower($strand_id) === "0") {
+            $strands = $db->select_all("strands");
+
+            if (!empty($strands)) {
+                $successCount = 0;
+
+                foreach ($strands as $strand) {
+                    $s_id = $strand["id"];
+
+                    if (!$db->run_custom_query("SELECT id FROM subjects WHERE name='$name' AND category='$category' AND grade_level='$grade_level' AND strand_id='$s_id'")) {
+                        $data = [
+                            "uuid" => generate_uuid(),
+                            "name" => $name,
+                            "category" => $category,
+                            "grade_level" => $grade_level,
+                            "strand_id" => $s_id,
+                            "created_at" => $current_datetime,
+                            "updated_at" => $current_datetime
+                        ];
+
+                        if ($db->insert("subjects", $data)) {
+                            $successCount++;
+                        }
+                    }
+                }
+
+                if ($successCount > 0) {
+                    $_SESSION["notification"] = [
+                        "title" => "Success!",
+                        "text" => "Successfully added $successCount subjects.",
+                        "icon" => "success",
+                    ];
+
+                    insert_log($_SESSION["user_id"], "Added $successCount subjects.");
+
+                    $response = true;
+                } else {
+                    $_SESSION["notification"] = [
+                        "title" => "Information",
+                        "text" => "No subject is added.",
+                        "icon" => "info",
+                    ];
+
+                    $response = true;
+                }
+            }
         } else {
-            $sql_2 = "SELECT id FROM grade_components WHERE subject_id='" . $subject_id . "' AND component='" . $component . "'";
-            $is_component_available = $db->run_custom_query($sql_2);
-
-            if (!$is_component_available) {
+            if (!$db->run_custom_query("SELECT id FROM subjects WHERE name='$name' AND category='$category' AND grade_level='$grade_level' AND strand_id='$strand_id'")) {
                 $data = [
                     "uuid" => generate_uuid(),
-                    "teacher_id" => $teacher_id,
-                    "subject_id" => $subject_id,
-                    "component" => $component,
-                    "weight" => $weight,
+                    "name" => $name,
+                    "category" => $category,
+                    "grade_level" => $grade_level,
+                    "strand_id" => $strand_id,
                     "created_at" => $current_datetime,
-                    "updated_at" => $current_datetime,
+                    "updated_at" => $current_datetime
                 ];
 
-                $db->insert("grade_components", $data);
+                if ($db->insert("subjects", $data)) {
+                    $_SESSION["notification"] = [
+                        "title" => "Success!",
+                        "text" => "A new subject has been added successfully.",
+                        "icon" => "success",
+                    ];
 
+                    insert_log($_SESSION["user_id"], "A new subject has been added successfully.");
+
+                    $response = true;
+                }
+            }
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["update_subject"])) {
+        $id = $_POST["id"];
+        $name = $_POST["name"];
+        $category = $_POST["category"];
+        $grade_level = $_POST["grade_level"];
+        $strand_id = $_POST["strand_id"];
+
+        $response = false;
+
+        if (!$db->run_custom_query("SELECT id FROM subjects WHERE name='$name' AND category='$category' AND grade_level='$grade_level' AND strand_id='$strand_id' AND id != '$id'")) {
+            $data = [
+                "name" => $name,
+                "category" => $category,
+                "grade_level" => $grade_level,
+                "strand_id" => $strand_id,
+                "updated_at" => $current_datetime
+            ];
+
+            if ($db->update("subjects", $data, "id", $id)) {
                 $_SESSION["notification"] = [
                     "title" => "Success!",
-                    "text" => "A grade component has been added successfully.",
+                    "text" => "A new subject has been updated successfully.",
                     "icon" => "success",
                 ];
 
-                insert_log($_SESSION["user_id"], "A grade component has been added successfully.");
-            } else {
-                $response["component_ok"] = false;
+                insert_log($_SESSION["user_id"], "A new subject has been updated successfully.");
+
+                $response = true;
             }
         }
 
         echo json_encode($response);
     }
 
-    if (isset($_POST["update_grade_component"])) {
-        $id = $_POST["id"];
-        $subject_id = $_POST["subject_id"];
-        $teacher_id = $_POST["teacher_id"];
-        $component = $_POST["component"];
-        $weight = $_POST["weight"];
-        $old_weight = $_POST["old_weight"];
-
-        $response = [
-            "component_ok" => true,
-            "weight_ok" => true,
-        ];
-
-        $sql = "SELECT SUM(weight) AS current_weight_sum FROM grade_components WHERE subject_id = '" . $subject_id . "' GROUP BY subject_id";
-        $current_weight_sum = $db->run_custom_query($sql);
-
-        if (intval($current_weight_sum[0]["current_weight_sum"]) + $weight - $old_weight > 100) {
-            $response["weight_ok"] = false;
-        } else {
-            $sql_2 = "SELECT id FROM grade_components WHERE subject_id='" . $subject_id . "' AND component='" . $component . "' AND id != '" . $id . "'";
-            $is_component_available = $db->run_custom_query($sql_2);
-
-            if (!$is_component_available) {
-                $data = [
-                    "teacher_id" => $teacher_id,
-                    "subject_id" => $subject_id,
-                    "component" => $component,
-                    "weight" => $weight,
-                    "updated_at" => $current_datetime,
-                ];
-
-                $db->update("grade_components", $data, "id", $id);
-
-                $_SESSION["notification"] = [
-                    "title" => "Success!",
-                    "text" => "A grade component has been updated successfully.",
-                    "icon" => "success",
-                ];
-
-                insert_log($_SESSION["user_id"], "A grade component has been updated successfully.");
-            } else {
-                $response["component_ok"] = false;
-            }
-        }
-
-        echo json_encode($response);
-    }
-
-    if (isset($_POST["delete_grade_component"])) {
+    if (isset($_POST["delete_subject"])) {
         $id = $_POST["id"];
 
-        $db->delete("grade_components", "id", $id);
+        $response = false;
 
-        $_SESSION["notification"] = [
-            "title" => "Success!",
-            "text" => "A grade component has been deleted successfully.",
-            "icon" => "success",
-        ];
-
-        insert_log($_SESSION["user_id"], "A grade component has been deleted successfully.");
-
-        echo json_encode(true);
-    }
-
-    if (isset($_POST["check_grade_component_weight"])) {
-        $teacher_id = $_POST["teacher_id"];
-
-        $response = !$db->check_subject_weight($teacher_id);
-
-        echo json_encode($response);
-    }
-
-    if (isset($_POST["new_student_grade"])) {
-        $teacher_id = $_POST["teacher_id"];
-        $student_id = $_POST["student_id"];
-        $subject_id = $_POST["subject_id"];
-        $grade_component_id = $_POST["grade_component_id"];
-        $course = $_POST["course"];
-        $year = $_POST["year"];
-        $semester = $_POST["semester"];
-        $grade = $_POST["grade"];
-
-        $sql = "SELECT id FROM student_grades WHERE student_id='" . $student_id . "' AND course='" . $course . "' AND year='" . $year . "' AND semester='" . $semester . "' AND subject_id='" . $subject_id . "' AND grade_component_id='" . $grade_component_id . "'";
-
-        if ($db->select_many(null, null, null, null, null, $sql)) {
-            $_SESSION["notification"] = [
-                "title" => "Oops..",
-                "text" => "This specific grade is already in the system for another record.",
-                "icon" => "error",
-            ];
-        } else {
-            $data = [
-                "uuid" => generate_uuid(),
-                "teacher_id" => $teacher_id,
-                "student_id" => $student_id,
-                "subject_id" => $subject_id,
-                "grade_component_id" => $grade_component_id,
-                "course" => $course,
-                "year" => $year,
-                "semester" => $semester,
-                "grade" => $grade,
-                "created_at" => $current_datetime,
-                "updated_at" => $current_datetime,
-            ];
-
-            $db->insert("student_grades", $data);
-
+        if ($db->delete("subjects", "id", $id)) {
             $_SESSION["notification"] = [
                 "title" => "Success!",
-                "text" => "A grade has been added successfully.",
+                "text" => "A subject has been deleted successfully.",
                 "icon" => "success",
             ];
 
-            insert_log($_SESSION["user_id"], "A grade has been added successfully.");
-        }
+            insert_log($_SESSION["user_id"], "A subject has been deleted successfully.");
 
-        echo json_encode(true);
-    }
-
-    if (isset($_POST["update_student_grade"])) {
-        $id = $_POST["id"];
-        $teacher_id = $_POST["teacher_id"];
-        $student_id = $_POST["student_id"];
-        $subject_id = $_POST["subject_id"];
-        $grade_component_id = $_POST["grade_component_id"];
-        $course = $_POST["course"];
-        $year = $_POST["year"];
-        $semester = $_POST["semester"];
-        $grade = $_POST["grade"];
-
-        $sql = "SELECT id FROM student_grades WHERE student_id='" . $student_id . "' AND course='" . $course . "' AND year='" . $year . "' AND semester='" . $semester . "' AND subject_id='" . $subject_id . "' AND grade_component_id='" . $grade_component_id . "' AND id != '" . $id . "'";
-
-        if ($db->select_many(null, null, null, null, null, $sql)) {
+            $response = true;
+        } else {
             $_SESSION["notification"] = [
-                "title" => "Oops..",
-                "text" => "This specific grade is already in the system for another record.",
+                "title" => "Oops...",
+                "text" => "Failed to delete the subject.",
                 "icon" => "error",
             ];
-        } else {
-            $data = [
-                "teacher_id" => $teacher_id,
-                "student_id" => $student_id,
-                "subject_id" => $subject_id,
-                "grade_component_id" => $grade_component_id,
-                "course" => $course,
-                "year" => $year,
-                "semester" => $semester,
-                "grade" => $grade,
-                "updated_at" => $current_datetime,
-            ];
 
-            $db->update("student_grades", $data, "id", $id);
-
-            $_SESSION["notification"] = [
-                "title" => "Success!",
-                "text" => "The grade has been updated successfully.",
-                "icon" => "success",
-            ];
-
-            insert_log($_SESSION["user_id"], "The grade has been updated successfully.");
+            $response = true;
         }
-
-        echo json_encode(true);
-    }
-
-    if (isset($_POST["delete_student_grade"])) {
-        $id = $_POST["id"];
-
-        $db->delete("student_grades", "id", $id);
-
-        $_SESSION["notification"] = [
-            "title" => "Success!",
-            "text" => "A student grade has been deleted successfully.",
-            "icon" => "success",
-        ];
-
-        insert_log($_SESSION["user_id"], "A student grade has been deleted successfully.");
-
-        echo json_encode(true);
-    }
-
-    if (isset($_POST["get_grade_data"])) {
-        $teacher_id = $_POST["teacher_id"];
-        $student_id = $_POST["student_id"];
-        $subject_id = $_POST["subject_id"];
-
-        $grade_components = $db->select_many("grade_components", "teacher_id", $teacher_id);
-
-        $components = array();
-        $grades = array();
-
-        foreach ($grade_components as $grade_component) {
-            $component_id = $grade_component['id'];
-
-            $sql = "SELECT grade FROM student_grades WHERE student_id=$student_id AND teacher_id=$teacher_id AND grade_component_id=$component_id AND subject_id=$subject_id";
-            $grade = $db->run_custom_query($sql);
-
-            if ($grade) {
-                array_push($components, $grade_component["component"]);
-                array_push($grades, $grade[0]["grade"]);
-            }
-        }
-
-        $response = [
-            "components" => $components,
-            "grades" => $grades,
-        ];
 
         echo json_encode($response);
     }
@@ -1091,7 +634,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST["restore_database"])) {
         $backup_file = basename($_POST["backup_file"]);
-        $backup_dir = 'backup/';
+        $backup_dir = 'public/backup/';
         $file_path = $backup_dir . $backup_file;
 
         if (!file_exists($file_path)) {
@@ -1134,7 +677,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(true);
     }
 } else {
-    http_response_code(500);
+    http_response_code(404);
 
-    echo "Direct access is not allowed!";
+    header("Location: " . base_url("404.php"));
 }

@@ -5,7 +5,7 @@ if (!isset($_SESSION["user_id"])) {
         "message" => "You must login first!",
     ];
 
-    header("location: /");
+    header("location: " . base_url());
 
     exit();
 } else {
@@ -17,6 +17,10 @@ if (!isset($_SESSION["user_id"])) {
         exit();
     }
 }
+
+$db = new Database();
+
+$strands = $db->select_all("strands", "name", "ASC");
 ?>
 
 <?php include_once "views/pages/templates/header.php" ?>
@@ -28,7 +32,7 @@ if (!isset($_SESSION["user_id"])) {
                 <h1>Students</h1>
                 <nav>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active">Students</li>
                     </ol>
                 </nav>
@@ -49,22 +53,23 @@ if (!isset($_SESSION["user_id"])) {
                         <table class="table datatable">
                             <thead>
                                 <tr>
-                                    <th>Student Number</th>
+                                    <th>Learner Reference Number</th>
                                     <th>Full Name</th>
-                                    <th>Course, Year & Section</th>
+                                    <th>Strand, Grade Level & Section</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if ($students = $db->select_all("students", "id", "DESC")): ?>
                                     <?php foreach ($students as $student): ?>
+                                        <?php $strand = $db->select_one("strands", "id", $student["strand_id"]); ?>
                                         <tr>
-                                            <td><?= $student["student_number"] ?></td>
+                                            <td><?= $student["lrn"] ?></td>
                                             <td><?= $student["first_name"] . ' ' . (!empty($student["middle_name"]) ? substr($student["middle_name"], 0, 1) . '. ' : '') . $student["last_name"] ?></td>
-                                            <td><?= $student["course"] . " " . $student["year"][0] . "-" . $student["section"] ?></td>
+                                            <td><?= $strand["code"] . " " . $student["grade_level"] . "-" . $student["section"] ?></td>
                                             <td class="text-center">
-                                                <i class="bi bi-pencil-fill text-primary me-1 update_student" role="button" student_id="<?= $student["account_id"] ?>"></i>
-                                                <i class="bi bi-trash-fill text-danger delete_student" role="button" student_id="<?= $student["account_id"] ?>"></i>
+                                                <i class="bi bi-pencil-fill text-primary me-1 update_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
+                                                <i class="bi bi-trash-fill text-danger delete_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
                                             </td>
                                         </tr>
                                     <?php endforeach ?>

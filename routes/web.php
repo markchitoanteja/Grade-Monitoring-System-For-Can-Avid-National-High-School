@@ -7,16 +7,12 @@ $routes = [
     // Main Pages
     'main'                  => 'views/pages/main.php',
     'dashboard'             => 'views/pages/dashboard.php',
-    'courses'               => 'views/pages/courses.php',
-    'subjects'              => 'views/pages/subjects.php',
-    'teachers'              => 'views/pages/teachers.php',
+    'strands'               => 'views/pages/strands.php',
     'students'              => 'views/pages/students.php',
+    'subjects'              => 'views/pages/subjects.php',
+    'grades'                => 'views/pages/grades.php',
     'backup_and_restore'    => 'views/pages/backup_and_restore.php',
-    'grade_components'      => 'views/pages/grade_components.php',
-    'grade_entries'         => 'views/pages/grade_entries.php',
-    'student_grades'        => 'views/pages/student_grades.php',
-    'my_grades'             => 'views/pages/my_grades.php',
-
+    
     // API Endpoints
     'server'                => 'api/server.php',
 

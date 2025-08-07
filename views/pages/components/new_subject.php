@@ -1,5 +1,5 @@
 <div class="modal fade" id="new_subject_modal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">New Subject</h5>
@@ -12,69 +12,47 @@
                         <i class="spinner-border"></i>
                     </div>
                     <div class="actual-form">
-                        <div class="row mb-3">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label for="new_subject_code">Subject Code</label>
-                                    <input type="text" class="form-control" id="new_subject_code" required>
-                                    <small class="text-danger d-none" id="error_new_subject_code">Subject Code is already in use!</small>
-                                </div>
-                            </div>
+                        <div class="alert alert-danger text-center d-none" id="new_subject_error_message">This subject already exists.</div>
+
+                        <div class="mb-3">
+                            <label for="new_subject_name" class="form-label">Subject Name</label>
+                            <input type="text" class="form-control" id="new_subject_name" required>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-lg-12">
-                                <div class="form-group mb-3">
-                                    <label for="new_subject_description">Descriptive Title</label>
-                                    <input type="text" class="form-control" id="new_subject_description" required>
-                                </div>
-                            </div>
+
+                        <div class="mb-3">
+                            <label for="new_subject_category" class="form-label">Category</label>
+                            <select class="form-select" id="new_subject_category" required>
+                                <option value="" selected disabled></option>
+                                <option value="core">Core</option>
+                                <option value="applied and specialized">Applied and Specialized</option>
+                            </select>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label for="new_subject_lecture_units">Lecture Units</label>
-                                    <input type="number" class="form-control" id="new_subject_lecture_units" required>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label for="new_subject_laboratory_units">Laboratory Units</label>
-                                    <input type="number" class="form-control" id="new_subject_laboratory_units" required>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label for="new_subject_hours_per_week">Hours/Week</label>
-                                    <input type="number" class="form-control" id="new_subject_hours_per_week" required>
-                                </div>
-                            </div>
+
+                        <div class="mb-3">
+                            <label for="new_subject_grade_level" class="form-label">Grade Level</label>
+                            <select class="form-select" id="new_subject_grade_level" required>
+                                <option value="" selected disabled></option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label for="new_subject_course">Course</label>
-                                <select id="new_subject_course" class="form-select">
-                                    <option value selected disabled></option>
-                                    <?php if ($courses = $db->select_all("courses", "code", "ASC")): ?>
-                                        <?php foreach ($courses as $course): ?>
-                                            <option value="<?= $course["code"] ?>"><?= $course["description"] ?></option>
-                                        <?php endforeach ?>
-                                    <?php endif ?>
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="new_subject_year">Year</label>
-                                <select id="new_subject_year" class="form-select" required disabled>
-                                    <!-- Data from AJAX -->
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="new_subject_semester">Semester</label>
-                                <select id="new_subject_semester" class="form-select">
-                                    <option value selected disabled></option>
-                                    <option value="1st">1st Semester</option>
-                                    <option value="2nd">2nd Semester</option>
-                                </select>
-                            </div>
+
+                        <div class="mb-3">
+                            <label for="new_subject_strand_id" class="form-label">Strand</label>
+                            <select class="form-select" id="new_subject_strand_id" required>
+                                <?php
+                                $db = new Database();
+                                $strands = $db->select_all("strands", "code", "ASC");
+                                ?>
+
+                                <option value="" selected disabled></option>
+                                <?php if ($strands): ?>
+                                    <option value="0">All Strands</option>
+                                    <?php foreach ($strands as $strand): ?>
+                                        <option value="<?= $strand["id"] ?>"><?= $strand["code"] ?></option>
+                                    <?php endforeach ?>
+                                <?php endif ?>
+                            </select>
                         </div>
                     </div>
                 </div>

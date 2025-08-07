@@ -1,66 +1,41 @@
 <?php
 
-/**
- * Class Database
- * Handles database connection, table creation, CRUD operations, backup and restore functionality.
- */
 class Database
 {
-    /**
-     * @var string $host The database host.
-     */
     private $host = 'localhost';
-
-    /**
-     * @var string $dbname The name of the database.
-     */
     private $dbname = 'u474266573_gms';
-
-    /**
-     * @var string $username The database username.
-     */
     private $username = 'u474266573_user_gms';
-
-    /**
-     * @var string $password The database password.
-     */
     private $password = 'Z;cc#>0h6|Nt';
+    private $connection = null;
+    private $error_log_file = "public/logs/error_logs.txt";
 
-    /**
-     * @var mysqli $connection The MySQLi connection object.
-     */
-    private $connection;
-
-    /**
-     * @var string $error_log_file Path to the error log file.
-     */
-    private $error_log_file = "logs/error_logs.txt";
-
-    /**
-     * Database constructor.
-     * Establishes connection and initializes database/tables.
-     */
     public function __construct()
     {
+        $this->make_error_logs_directory();
+
         $this->connect();
         $this->create_database();
         $this->select_database();
         $this->create_users_table();
+        $this->create_strands_table();
         $this->create_students_table();
-        $this->create_teachers_table();
-        $this->create_courses_table();
         $this->create_subjects_table();
-        $this->create_student_grades_table();
-        $this->create_grade_components_table();
+        $this->create_grades_table();
         $this->create_logs_table();
         $this->insert_admin_data();
     }
 
-    /**
-     * Establishes a connection to the MySQL server.
-     *
-     * @return void
-     */
+    private function make_error_logs_directory()
+    {
+        if (!file_exists($this->error_log_file)) {
+            $log_dir = dirname($this->error_log_file);
+            if (!is_dir($log_dir)) {
+                mkdir($log_dir, 0755, true);
+            }
+            file_put_contents($this->error_log_file, '');
+        }
+    }
+
     private function connect()
     {
         $this->connection = new mysqli($this->host, $this->username, $this->password);
@@ -70,11 +45,6 @@ class Database
         }
     }
 
-    /**
-     * Creates the database if it doesn't exist.
-     *
-     * @return void
-     */
     private function create_database()
     {
         $sql = "CREATE DATABASE IF NOT EXISTS " . $this->dbname;
@@ -84,21 +54,11 @@ class Database
         }
     }
 
-    /**
-     * Selects the active database.
-     *
-     * @return void
-     */
     private function select_database()
     {
         $this->connection->select_db($this->dbname);
     }
 
-    /**
-     * Creates the 'users' table if it doesn't exist.
-     *
-     * @return void
-     */
     private function create_users_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS users (
@@ -118,169 +78,105 @@ class Database
         }
     }
 
-    /**
-     * Creates the 'students' table if it doesn't exist.
-     *
-     * @return void
-     */
     private function create_students_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS students (
             id INT(11) AUTO_INCREMENT PRIMARY KEY,
             uuid VARCHAR(36) NOT NULL UNIQUE,
             account_id INT(11) NOT NULL UNIQUE,
-            student_number VARCHAR(100) NOT NULL UNIQUE,
-            course VARCHAR(100) NOT NULL,
-            year VARCHAR(100) NOT NULL,
-            section VARCHAR(100) NOT NULL,
-            first_name VARCHAR(100) NOT NULL,
-            middle_name VARCHAR(100) NOT NULL,
-            last_name VARCHAR(100) NOT NULL,
-            birthday VARCHAR(100) NOT NULL,
-            mobile_number VARCHAR(100) NOT NULL,
-            email VARCHAR(100) NOT NULL,
-            address TEXT NOT NULL,
+            lrn VARCHAR(12) NOT NULL UNIQUE,
+            strand_id INT(11) NOT NULL,
+            grade_level ENUM('11', '12') NOT NULL,
+            section VARCHAR(20) NOT NULL,
+            first_name VARCHAR(50) NOT NULL,
+            middle_name VARCHAR(50),
+            last_name VARCHAR(50) NOT NULL,
+            birthday DATE NOT NULL,
+            sex ENUM('Male', 'Female') NOT NULL,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            address VARCHAR(255) NOT NULL,
             created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
+            updated_at DATETIME NOT NULL,
+            FOREIGN KEY (strand_id) REFERENCES strands(id)
+                ON DELETE RESTRICT
+                ON UPDATE CASCADE,
+            FOREIGN KEY (account_id) REFERENCES users(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
         )";
 
         if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
+            die("Error creating students table: " . $this->connection->error);
         }
     }
 
-    /**
-     * Creates the 'teachers' table if it doesn't exist.
-     *
-     * @return void
-     */
-    private function create_teachers_table()
+    private function create_strands_table()
     {
-        $sql = "CREATE TABLE IF NOT EXISTS teachers (
+        $sql = "CREATE TABLE IF NOT EXISTS strands (
             id INT(11) AUTO_INCREMENT PRIMARY KEY,
             uuid VARCHAR(36) NOT NULL UNIQUE,
-            account_id INT(11) NOT NULL UNIQUE,
-            employee_number VARCHAR(100) NOT NULL UNIQUE,
-            first_name VARCHAR(100) NOT NULL,
-            middle_name VARCHAR(100) NOT NULL,
-            last_name VARCHAR(100) NOT NULL,
-            birthday VARCHAR(100) NOT NULL,
-            mobile_number VARCHAR(100) NOT NULL,
-            email VARCHAR(100) NOT NULL,
-            address TEXT NOT NULL,
+            code VARCHAR(10) NOT NULL UNIQUE,
+            name VARCHAR(100) NOT NULL,
+            description TEXT,
             created_at DATETIME NOT NULL,
             updated_at DATETIME NOT NULL
         )";
 
         if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
+            die("Error creating strands table: " . $this->connection->error);
         }
     }
 
-    /**
-     * Creates the 'courses' table if it doesn't exist.
-     *
-     * @return void
-     */
-    private function create_courses_table()
-    {
-        $sql = "CREATE TABLE IF NOT EXISTS courses (
-            id INT(11) AUTO_INCREMENT PRIMARY KEY,
-            uuid VARCHAR(36) NOT NULL UNIQUE,
-            code VARCHAR(100) NOT NULL UNIQUE,
-            description VARCHAR(100) NOT NULL,
-            years INT(11) NOT NULL,
-            created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
-        )";
-
-        if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
-        }
-    }
-
-    /**
-     * Creates the 'grade_components' table if it doesn't exist.
-     *
-     * @return void
-     */
-    private function create_grade_components_table()
-    {
-        $sql = "CREATE TABLE IF NOT EXISTS grade_components (
-            id INT(11) AUTO_INCREMENT PRIMARY KEY,
-            uuid VARCHAR(36) NOT NULL UNIQUE,
-            teacher_id INT(11) NOT NULL,
-            subject_id INT(11) NOT NULL,
-            component VARCHAR(255) NOT NULL,
-            weight INT(11) NOT NULL,
-            created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
-        )";
-
-        if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
-        }
-    }
-
-    /**
-     * Creates the 'student_grades' table if it doesn't exist.
-     *
-     * @return void
-     */
-    private function create_student_grades_table()
-    {
-        $sql = "CREATE TABLE IF NOT EXISTS student_grades (
-            id INT(11) AUTO_INCREMENT PRIMARY KEY,
-            uuid VARCHAR(36) NOT NULL UNIQUE,
-            teacher_id INT(11) NOT NULL,
-            student_id INT(11) NOT NULL,
-            subject_id INT(11) NOT NULL,
-            grade_component_id INT(11) NOT NULL,
-            course VARCHAR(100) NOT NULL,
-            year VARCHAR(10) NOT NULL,
-            semester VARCHAR(10) NOT NULL,
-            grade FLOAT(11,2) NOT NULL,
-            created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
-        )";
-
-        if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
-        }
-    }
-
-    /**
-     * Creates the 'subjects' table if it doesn't exist.
-     *
-     * @return void
-     */
     private function create_subjects_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS subjects (
             id INT(11) AUTO_INCREMENT PRIMARY KEY,
             uuid VARCHAR(36) NOT NULL UNIQUE,
-            code VARCHAR(100) NOT NULL,
-            description VARCHAR(100) NOT NULL,
-            lecture_units INT(11) NOT NULL,
-            laboratory_units INT(11) NOT NULL,
-            hours_per_week INT(11) NOT NULL,
-            course VARCHAR(100) NOT NULL,
-            year VARCHAR(10) NOT NULL,
-            semester VARCHAR(10) NOT NULL,
+            name VARCHAR(100) NOT NULL,
+            category ENUM('core', 'applied and specialized') NOT NULL,
+            grade_level ENUM('11', '12'),
+            strand_id INT(11),
             created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
+            updated_at DATETIME NOT NULL,
+            FOREIGN KEY (strand_id) REFERENCES strands(id)
+                ON DELETE SET NULL
+                ON UPDATE CASCADE
         )";
 
         if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
+            die("Error creating subjects table: " . $this->connection->error);
         }
     }
 
-    /**
-     * Creates the 'logs' table if it doesn't exist.
-     *
-     * @return void
-     */
+    private function create_grades_table()
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS grades (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            uuid VARCHAR(36) NOT NULL UNIQUE,
+            student_id INT(11) NOT NULL,
+            subject_id INT(11) NOT NULL,
+            quarter_1 DECIMAL(5,2),
+            quarter_2 DECIMAL(5,2),
+            quarter_3 DECIMAL(5,2),
+            quarter_4 DECIMAL(5,2),
+            final_grade DECIMAL(5,2),
+            remarks VARCHAR(20),
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
+            UNIQUE(student_id, subject_id), -- Prevent duplicate entries for the same subject
+            FOREIGN KEY (student_id) REFERENCES students(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE,
+            FOREIGN KEY (subject_id) REFERENCES subjects(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+        )";
+
+        if (!$this->connection->query($sql) === TRUE) {
+            die("Error creating grades table: " . $this->connection->error);
+        }
+    }
+
     private function create_logs_table()
     {
         $sql = "CREATE TABLE IF NOT EXISTS logs (
@@ -297,11 +193,6 @@ class Database
         }
     }
 
-    /**
-     * Inserts default administrator data if not present.
-     *
-     * @return void
-     */
     private function insert_admin_data()
     {
         $is_admin_exists = $this->select_one("users", "id", "1");
@@ -322,22 +213,11 @@ class Database
         }
     }
 
-    /**
-     * Generates a random UUID.
-     *
-     * @return string
-     */
     private function generate_uuid()
     {
         return bin2hex(random_bytes(16));
     }
 
-    /**
-     * Determines parameter types for prepared statements.
-     *
-     * @param array $data
-     * @return string
-     */
     private function getParamTypes($data)
     {
         return implode('', array_map(function ($value) {
@@ -444,15 +324,25 @@ class Database
             $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
             $stmt = $this->connection->prepare($sql);
 
+            if (!$stmt) {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Prepare failed: " . $this->connection->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
+                return false;
+            }
+
             $types = $this->getParamTypes($data);
             $values = array_values($data);
 
             if ($stmt->bind_param($types, ...$values) && $stmt->execute()) {
                 return true;
             } else {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Bind/Execute failed: " . $stmt->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
                 return false;
             }
         } catch (mysqli_sql_exception $e) {
+            $error_message = "[" . date("Y-m-d H:i:s") . "] Exception: " . $e->getMessage() . PHP_EOL;
+            file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
             return false;
         }
     }
@@ -476,18 +366,32 @@ class Database
             $sql = "UPDATE $table SET $set WHERE $condition_column = ?";
             $stmt = $this->connection->prepare($sql);
 
+            if (!$stmt) {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Update Prepare failed: " . $this->connection->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
+                return false;
+            }
+
             $types = $this->getParamTypes($data);
             $values = array_values($data);
             $types .= is_int($condition_value) ? 'i' : 's';
 
-            $stmt->bind_param($types, ...array_merge($values, [$condition_value]));
+            if (!$stmt->bind_param($types, ...array_merge($values, [$condition_value]))) {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Update Bind failed: " . $stmt->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
+                return false;
+            }
 
             if ($stmt->execute()) {
                 return true;
             } else {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Update Execute failed: " . $stmt->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
                 return false;
             }
         } catch (mysqli_sql_exception $e) {
+            $error_message = "[" . date("Y-m-d H:i:s") . "] Update Exception: " . $e->getMessage() . PHP_EOL;
+            file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
             return false;
         }
     }
@@ -506,15 +410,30 @@ class Database
             $sql = "DELETE FROM $table WHERE $condition_column = ?";
             $stmt = $this->connection->prepare($sql);
 
+            if (!$stmt) {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Delete Prepare failed: " . $this->connection->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
+                return false;
+            }
+
             $type = is_int($condition_value) ? 'i' : 's';
-            $stmt->bind_param($type, $condition_value);
+
+            if (!$stmt->bind_param($type, $condition_value)) {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Delete Bind failed: " . $stmt->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
+                return false;
+            }
 
             if ($stmt->execute()) {
                 return true;
             } else {
+                $error_message = "[" . date("Y-m-d H:i:s") . "] Delete Execute failed: " . $stmt->error . PHP_EOL;
+                file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
                 return false;
             }
         } catch (mysqli_sql_exception $e) {
+            $error_message = "[" . date("Y-m-d H:i:s") . "] Delete Exception: " . $e->getMessage() . PHP_EOL;
+            file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
             return false;
         }
     }
@@ -543,17 +462,30 @@ class Database
     }
 
     /**
-     * Runs a custom SQL query and returns the result.
+     * Runs a custom SQL query (SELECT, INSERT, DROP, etc.) and returns result if applicable.
      *
      * @param string $custom_sql
-     * @return array
+     * @return array|bool Returns result array for SELECT, true for successful non-SELECT, false on failure.
      */
     public function run_custom_query($custom_sql)
     {
         $stmt = $this->connection->prepare($custom_sql);
-        $stmt->execute();
 
-        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        if (!$stmt) {
+            return false;
+        }
+
+        if (!$stmt->execute()) {
+            return false;
+        }
+
+        $result = $stmt->get_result();
+        
+        if ($result) {
+            return $result->fetch_all(MYSQLI_ASSOC);
+        }
+
+        return true;
     }
 
     /**
@@ -595,12 +527,15 @@ class Database
     public function backup($backupDir = null)
     {
         $backupDir = $backupDir ?? __DIR__;
+        if (!is_dir($backupDir)) {
+            mkdir($backupDir, 0755, true);
+        }
+
         $backupFile = $backupDir . '/backup_' . $this->dbname . '_' . date("Y-m-d_H-i-s") . '.sql';
 
         try {
             $tables = [];
             $result = $this->connection->query("SHOW TABLES");
-
             if (!$result) {
                 throw new Exception("Error retrieving tables: " . $this->connection->error);
             }
@@ -609,83 +544,110 @@ class Database
                 $tables[] = $row[0];
             }
 
-            $sqlDump = "-- Database Backup\n-- Database: {$this->dbname}\n-- Date: " . date("Y-m-d H:i:s") . "\n\n";
+            $sqlDump = "-- Database Backup\n";
+            $sqlDump .= "-- Database: `{$this->dbname}`\n";
+            $sqlDump .= "-- Date: " . date("Y-m-d H:i:s") . "\n\n";
+            $sqlDump .= "SET FOREIGN_KEY_CHECKS = 0;\n\n";
 
             foreach ($tables as $table) {
-                $tableCreate = $this->connection->query("SHOW CREATE TABLE `$table`")->fetch_row()[1] . ";\n\n";
+                // Drop table if exists
+                $sqlDump .= "-- ----------------------------\n";
                 $sqlDump .= "-- Structure for table `$table`\n";
-                $sqlDump .= $tableCreate . "\n\n";
+                $sqlDump .= "-- ----------------------------\n";
+                $sqlDump .= "DROP TABLE IF EXISTS `$table`;\n";
 
-                $result = $this->connection->query("SELECT * FROM `$table`");
+                // Table structure
+                $createTable = $this->connection->query("SHOW CREATE TABLE `$table`");
+                if ($createTable) {
+                    $row = $createTable->fetch_row();
+                    $sqlDump .= $row[1] . ";\n\n";
+                }
 
-                if ($result->num_rows > 0) {
+                // Table data
+                $dataResult = $this->connection->query("SELECT * FROM `$table`");
+                if ($dataResult && $dataResult->num_rows > 0) {
+                    $sqlDump .= "-- ----------------------------\n";
                     $sqlDump .= "-- Data for table `$table`\n";
-                    while ($row = $result->fetch_assoc()) {
-                        $values = array_map([$this->connection, 'real_escape_string'], array_values($row));
-                        $values = "'" . implode("', '", $values) . "'";
-                        $columns = implode("`, `", array_keys($row));
-                        $sqlDump .= "INSERT INTO `$table` (`$columns`) VALUES ($values);\n";
+                    $sqlDump .= "-- ----------------------------\n";
+
+                    while ($row = $dataResult->fetch_assoc()) {
+                        $columns = array_map(function ($col) {
+                            return "`$col`";
+                        }, array_keys($row));
+
+                        $values = array_map(function ($value) {
+                            if (is_null($value)) {
+                                return "NULL";
+                            }
+                            return "'" . addslashes($value) . "'";
+                        }, array_values($row));
+
+                        $sqlDump .= "INSERT INTO `$table` (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $values) . ");\n";
                     }
+
                     $sqlDump .= "\n";
                 }
             }
 
+            $sqlDump .= "SET FOREIGN_KEY_CHECKS = 1;\n";
+
             if (file_put_contents($backupFile, $sqlDump) === false) {
-                throw new Exception("Error writing backup file");
+                throw new Exception("Error writing to backup file.");
             }
 
             return $backupFile;
         } catch (Exception $e) {
             $error_message = date('Y-m-d H:i:s') . " - Error: " . $e->getMessage() . "\n";
-
             file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
+            return null;
         }
     }
 
     /**
-     * Restores the database from a backup file.
+     * Restores the database from a backup file using pre-defined helper methods.
      *
      * @param string $file_path Path to the backup file.
      * @return bool
      */
     public function restore($file_path)
     {
-        if (file_exists($file_path)) {
+        if (!file_exists($file_path)) {
+            file_put_contents($this->error_log_file, "Backup file does not exist: $file_path" . PHP_EOL, FILE_APPEND);
+            return false;
+        }
+
+        try {
+            // Disable foreign key checks
+            $this->run_custom_query("SET FOREIGN_KEY_CHECKS = 0");
+
+            // Drop all existing tables
             $this->drop_all_tables();
 
-            $fp = fopen($file_path, 'r');
-            $fetchData = fread($fp, filesize($file_path));
-            fclose($fp);
+            // Re-enable foreign key checks before restore
+            $this->run_custom_query("SET FOREIGN_KEY_CHECKS = 1");
 
-            $sqlInfo = explode(";\n", $fetchData);
+            // Read and clean SQL file
+            $sqlContent = file_get_contents($file_path);
+            $sqlContent = preg_replace('/--.*(\r?\n)/', '', $sqlContent);     // Remove -- comments
+            $sqlContent = preg_replace('/\/\*.*?\*\//s', '', $sqlContent);    // Remove /* */ comments
 
-            foreach ($sqlInfo as $sqlData) {
-                $sqlData = trim($sqlData);
+            // Split SQL into individual statements
+            $queries = array_filter(array_map('trim', explode(";\n", $sqlContent)));
 
-                if (!empty($sqlData)) {
-                    try {
-                        $stmt = $this->connection->prepare($sqlData);
-                        if ($stmt) {
-                            $stmt->execute();
-                        } else {
-                            $error_message = "Failed to prepare statement: " . $this->connection->error;
-
-                            file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
-                        }
-                    } catch (mysqli_sql_exception $e) {
-                        $error_message = "Error executing query: " . $e->getMessage();
-
+            // Execute each query
+            foreach ($queries as $query) {
+                if (!empty($query)) {
+                    $result = $this->run_custom_query($query);
+                    if ($result === false) {
+                        $error_message = "Error executing query: $query" . PHP_EOL;
                         file_put_contents($this->error_log_file, $error_message, FILE_APPEND);
                     }
                 }
             }
 
-            $this->connection->commit();
-
             return true;
-        } else {
-            file_put_contents($this->error_log_file, "Backup file does not exist: " . $file_path, FILE_APPEND);
-
+        } catch (Exception $e) {
+            file_put_contents($this->error_log_file, "Restore failed: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
             return false;
         }
     }

@@ -11,13 +11,19 @@ if (session_status() === PHP_SESSION_NONE) {
 // Helper function for generating base URLs
 function base_url($path = '')
 {
+    // Localhost
     $base = 'http://localhost/Grade-Monitoring-System-For-Can-Avid-National-High-School/';
+    // Online
+    // $base = 'https://grade-monitoring-system.essuc.online/';
+
     return rtrim($base, '/') . '/' . ltrim($path, '/');
 }
 
 // Load essential configuration and route files
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/routes/web.php';
+require_once 'config/database.php';
+require_once 'routes/web.php';
+
+new Database();
 
 // Automatically detect and normalize URI
 $scriptName = dirname($_SERVER['SCRIPT_NAME']);
@@ -35,5 +41,5 @@ if (array_key_exists($uri, $routes)) {
     require $routes[$uri];
 } else {
     http_response_code(404);
-    require __DIR__ . '/views/errors/404.php';
+    require 'views/errors/404.php';
 }

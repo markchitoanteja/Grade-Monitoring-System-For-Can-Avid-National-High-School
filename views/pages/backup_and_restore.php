@@ -5,7 +5,7 @@ if (!isset($_SESSION["user_id"])) {
         "message" => "You must login first!",
     ];
 
-    header("location: /");
+    header("location: " . base_url());
 
     exit();
 } else {
@@ -39,7 +39,7 @@ if (!isset($_SESSION["user_id"])) {
                 <h1>Backup and Restore</h1>
                 <nav>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active">Backup and Restore</li>
                     </ol>
                 </nav>
@@ -55,7 +55,7 @@ if (!isset($_SESSION["user_id"])) {
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-journal-bookmark me-1"></i> All Teachers</h5>
+                        <h5 class="card-title"><i class="bi bi-journal-bookmark me-1"></i> All Backups</h5>
 
                         <table class="table datatable">
                             <thead>
@@ -92,8 +92,5 @@ if (!isset($_SESSION["user_id"])) {
         </div>
     </section>
 </main>
-
-<?php include_once "views/pages/components/new_teacher.php" ?>
-<?php include_once "views/pages/components/update_teacher.php" ?>
 
 <?php include_once "views/pages/templates/footer.php" ?>
