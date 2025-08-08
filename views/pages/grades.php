@@ -35,7 +35,7 @@ if (!isset($_SESSION["user_id"])) {
             </div>
             <div class="col-6">
                 <div class="d-flex gap-2 justify-content-end">
-                    <button class="btn btn-success">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ocr_upload_modal">
                         <i class="bi bi-upload"></i> Upload Image
                     </button>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new_grade_modal">
@@ -93,5 +93,6 @@ if (!isset($_SESSION["user_id"])) {
 
 <?php include_once "views/pages/components/new_grade.php" ?>
 <?php include_once "views/pages/components/update_grade.php" ?>
+<?php include_once "views/pages/components/ocr_upload.php" ?>
 
 <?php include_once "views/pages/templates/footer.php" ?>

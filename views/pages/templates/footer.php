@@ -22,7 +22,7 @@
         <script src="<?= base_url("public/assets/vendor/jquery/jquery.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/vendor/sweetalert2/js/sweetalert2.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/js/main.js") ?>"></script>
-        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.2.0") ?>"></script>
+        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.2.2") ?>"></script>
     </body>
 </html>
 

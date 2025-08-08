@@ -1027,8 +1027,8 @@ jQuery(document).ready(function () {
 
         var formData = new FormData();
 
-        formData.append('id', id); 
-        formData.append('student_id', student_id); 
+        formData.append('id', id);
+        formData.append('student_id', student_id);
         formData.append('subject_id', subject_id);
         formData.append('quarter_1', quarter_1);
         formData.append('quarter_2', quarter_2);
@@ -1346,3 +1346,139 @@ jQuery(document).ready(function () {
         }
     }
 })
+
+// ============== Experimental Phase ================= //
+$(function () {
+    const coreSubjects = [
+        "Oral Communication",
+        "Komunikasyon at Pananaliksik sa Wika at Kulturang Pilipino",
+        "Introduction to the Philosophy of the Human Person / Pambungad sa Pilosopiya ng Tao",
+        "Physical Education and Health 1",
+        "General Mathematics",
+        "Earth Science"
+    ];
+    
+    const appliedSpecializedSubjects = [
+        "Empowerment Technologies",
+        "Pre-Calculus",
+        "General Chemistry 1"
+    ];
+
+    function createSectionHeader(title) {
+        return $('<tr>').append(
+            $('<td>').attr('colspan', 4).addClass('table-secondary fw-bold text-start').css({ background: '#e9ecef', color: '#495057' }).text(title)
+        );
+    }
+    
+    function renderBlankGrades() {
+        const tbody = $('#ocr_parsed_grades');
+        tbody.empty();
+        tbody.append(createSectionHeader('Core Subjects'));
+        coreSubjects.forEach(subject => {
+            tbody.append(
+                $('<tr>')
+                    .append($('<td>').addClass('text-start').text(subject))
+                    .append($('<td>').text('—'))
+                    .append($('<td>').text('—'))
+                    .append($('<td>').text('—')) // Semester grade blank as em dash
+            );
+        });
+        tbody.append(createSectionHeader('Applied and Specialized Subjects'));
+        appliedSpecializedSubjects.forEach(subject => {
+            tbody.append(
+                $('<tr>')
+                    .append($('<td>').addClass('text-start').text(subject))
+                    .append($('<td>').text('—'))
+                    .append($('<td>').text('—'))
+                    .append($('<td>').text('—')) // Semester grade blank as em dash
+            );
+        });
+        // General Average Row
+        tbody.append(
+            $('<tr>')
+                .append($('<td>').attr('colspan', 3).addClass('text-end fw-semibold').text('General Average for the Semester'))
+                .append($('<td>').text('—'))
+        );
+    }
+
+    $('#ocr_upload_modal').on('show.bs.modal', renderBlankGrades);
+    
+    $('#ocr_upload_form').on('submit', function (e) {
+        e.preventDefault();
+        
+        const form = this;
+        const submitBtn = $('#ocr_submit_btn');
+        const parsedGradesTbody = $('#ocr_parsed_grades');
+        
+        submitBtn.prop('disabled', true);
+        submitBtn.html("Please wait...");
+        
+        const formData = new FormData(form);
+        
+        formData.append('ocr_upload', 1);
+        
+        $.ajax({
+            url: base_url + 'server',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function (data) {
+                submitBtn.prop('disabled', false);
+                submitBtn.html("Extract Grades");
+
+                if (data.success) {
+                    parsedGradesTbody.empty();
+                    let allGrades = [];
+                    parsedGradesTbody.append(createSectionHeader('Core Subjects'));
+                    coreSubjects.forEach(subject => {
+                        const grades = data.parsed_grades[subject] || [];
+                        let semGrade = '—';
+                        if (grades.length >= 2 && $.isNumeric(grades[0]) && $.isNumeric(grades[1])) {
+                            semGrade = ((parseFloat(grades[0]) + parseFloat(grades[1])) / 2).toFixed(2);
+                            allGrades.push(parseFloat(semGrade));
+                        }
+                        parsedGradesTbody.append(
+                            $('<tr>')
+                                .append($('<td>').addClass('text-start').text(subject))
+                                .append($('<td>').text(grades[0] !== undefined ? grades[0] : '—'))
+                                .append($('<td>').text(grades[1] !== undefined ? grades[1] : '—'))
+                                .append($('<td>').text(semGrade))
+                        );
+                    });
+                    parsedGradesTbody.append(createSectionHeader('Applied and Specialized Subjects'));
+                    appliedSpecializedSubjects.forEach(subject => {
+                        const grades = data.parsed_grades[subject] || [];
+                        let semGrade = '—';
+                        if (grades.length >= 2 && $.isNumeric(grades[0]) && $.isNumeric(grades[1])) {
+                            semGrade = ((parseFloat(grades[0]) + parseFloat(grades[1])) / 2).toFixed(2);
+                            allGrades.push(parseFloat(semGrade));
+                        }
+                        parsedGradesTbody.append(
+                            $('<tr>')
+                                .append($('<td>').addClass('text-start').text(subject))
+                                .append($('<td>').text(grades[0] !== undefined ? grades[0] : '—'))
+                                .append($('<td>').text(grades[1] !== undefined ? grades[1] : '—'))
+                                .append($('<td>').text(semGrade))
+                        );
+                    });
+                    // General Average Row
+                    let genAvg = allGrades.length ? (allGrades.reduce((a, b) => a + b, 0) / allGrades.length).toFixed(2) : '—';
+                    parsedGradesTbody.append(
+                        $('<tr>')
+                            .append($('<td>').attr('colspan', 3).addClass('text-end fw-semibold').text('General Average for the Semester'))
+                            .append($('<td>').text(genAvg))
+                    );
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error occurred.'));
+                }
+            },
+            error: function () {
+                submitBtn.prop('disabled', false);
+                alert('Failed to process OCR. Please try again.');
+            }
+        });
+    });
+});
+// ============== Experimental Phase ================= //

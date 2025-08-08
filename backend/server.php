@@ -2,6 +2,7 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 require 'vendor/autoload.php';
 
@@ -9,6 +10,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_datetime = date("Y-m-d H:i:s");
 
     $db = new Database();
+
+    // ============== Experimental Phase ================= //
+    function mergeSubjectLines(array $lines): array
+    {
+        $mergedLines = [];
+        $buffer = '';
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                // Empty line indicates end of buffer subject line
+                if ($buffer !== '') {
+                    $mergedLines[] = $buffer;
+                    $buffer = '';
+                }
+                continue;
+            }
+            if (preg_match('/\d/', $line)) {
+                // Line with digits likely contains grades; flush buffer first
+                if ($buffer !== '') {
+                    $mergedLines[] = $buffer;
+                }
+                $mergedLines[] = $line;
+                $buffer = '';
+            } else {
+                // No digits, probably subject name continuation; merge
+                if ($buffer === '') {
+                    $buffer = $line;
+                } else {
+                    $buffer .= ' ' . $line;
+                }
+            }
+        }
+        if ($buffer !== '') {
+            $mergedLines[] = $buffer;
+        }
+        return $mergedLines;
+    }
+
+    function fuzzyMatch(string $text, string $subject): float
+    {
+        similar_text(strtolower($text), strtolower($subject), $percent);
+        return $percent;
+    }
+
+    function parseKnownSubjects(string $ocrText, array $subjects, int $fuzzyThreshold = 60): array
+    {
+        $results = [];
+        $lines = explode("\n", $ocrText);
+        $lines = mergeSubjectLines($lines);
+
+        // Regex to match grades (you can adjust this pattern if needed)
+        $gradePattern = '/\b([0-9]{1,3})\b/';  // now capturing any 1 to 3 digit number, safer for flexibility
+
+        foreach ($subjects as $subject) {
+            $results[$subject] = [];
+            $bestLineIndex = -1;
+            $bestMatchPercent = 0;
+
+            // Find best matching line for subject
+            foreach ($lines as $index => $line) {
+                $percent = fuzzyMatch($line, $subject);
+                if ($percent > $bestMatchPercent) {
+                    $bestMatchPercent = $percent;
+                    $bestLineIndex = $index;
+                }
+            }
+
+            if ($bestMatchPercent < $fuzzyThreshold) {
+                // No good match found, skip this subject
+                continue;
+            }
+
+            // Consider the matched line and possibly the next line (grades may be on the next line)
+            $searchLines = [$lines[$bestLineIndex]];
+            if (isset($lines[$bestLineIndex + 1])) {
+                $searchLines[] = $lines[$bestLineIndex + 1];
+            }
+
+            foreach ($searchLines as $line) {
+                preg_match_all($gradePattern, $line, $matches);
+                if (!empty($matches[0])) {
+                    foreach ($matches[0] as $grade) {
+                        // Validate grade range (optional)
+                        $gradeNum = (int) $grade;
+                        if ($gradeNum >= 0 && $gradeNum <= 100) {
+                            $results[$subject][] = $gradeNum;
+                        }
+                    }
+                }
+            }
+        }
+        return $results;
+    }
+    // ============== Experimental Phase ================= //
 
     function send_email($receiver_email, $receiver_name, $subject, $body)
     {
@@ -833,6 +929,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         echo json_encode($response);
+    }
+
+    if (isset($_POST["ocr_upload"])) {
+        if (!isset($_FILES['image'])) {
+            echo json_encode(['error' => 'No image file uploaded']);
+            exit;
+        }
+
+        $uploadDir = __DIR__ . '/_uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $uploadedFilename = upload_image($uploadDir, $_FILES['image']);
+
+        if ($uploadedFilename === false) {
+            echo json_encode(['error' => 'Failed to upload image.']);
+            exit;
+        }
+
+        $imagePath = $uploadDir . $uploadedFilename;
+
+        try {
+            $ocr = new TesseractOCR($imagePath);
+            $rawText = $ocr->run();
+
+            $knownSubjects = [
+                "Oral Communication",
+                "Komunikasyon at Pananaliksik sa Wika at Kulturang Pilipino",
+                "Introduction to the Philosophy of the Human Person / Pambungad sa Pilosopiya ng Tao",
+                "Physical Education and Health 1",
+                "General Mathematics",
+                "Earth Science",
+                "Empowerment Technologies",
+                "Pre-Calculus",
+                "General Chemistry 1"
+            ];
+
+            $parsedGrades = parseKnownSubjects($rawText, $knownSubjects);
+
+            echo json_encode([
+                'success' => true,
+                'raw_text' => $rawText,
+                'parsed_grades' => $parsedGrades
+            ]);
+            exit;
+        } catch (Exception $e) {
+            echo json_encode(['error' => 'OCR processing failed: ' . $e->getMessage()]);
+            exit;
+        }
     }
 
     if (isset($_POST["backup_database"])) {
