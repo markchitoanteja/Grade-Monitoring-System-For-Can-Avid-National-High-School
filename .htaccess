@@ -1,4 +1,5 @@
 RewriteEngine On
+# RewriteBase /
 RewriteBase /Grade-Monitoring-System-For-Can-Avid-National-High-School/
 
 RewriteCond %{REQUEST_FILENAME} !-f

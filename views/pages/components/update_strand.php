@@ -12,7 +12,6 @@
                         <i class="spinner-border"></i>
                     </div>
                     <div class="actual-form">
-                        <!-- Hidden input to store strand ID -->
                         <input type="hidden" id="update_strand_id">
 
                         <div class="row mb-3">

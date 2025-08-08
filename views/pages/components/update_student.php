@@ -36,7 +36,6 @@
                                 <div class="form-group">
                                     <label for="update_student_strand_id">Strand</label>
                                     <select id="update_student_strand_id" class="form-select" required>
-                                        <option value selected disabled></option>
                                         <?php if ($strand = $db->select_all("strands", "code", "ASC")): ?>
                                             <?php foreach ($strands as $strand): ?>
                                                 <option value="<?= $strand["id"] ?>"><?= $strand["code"] ?></option>
@@ -49,7 +48,6 @@
                                 <div class="form-group">
                                     <label for="update_student_grade_level">Grade Level</label>
                                     <select id="update_student_grade_level" class="form-select" required>
-                                        <option value selected disabled></option>
                                         <option value="11">11</option>
                                         <option value="12">12</option>
                                     </select>
@@ -93,7 +91,6 @@
                                 <div class="form-group">
                                     <label for="update_student_sex">Sex</label>
                                     <select class="form-select" id="update_student_sex" required>
-                                        <option value selected disabled></option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>

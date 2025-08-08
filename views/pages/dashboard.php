@@ -10,37 +10,75 @@ if (!isset($_SESSION["user_id"])) {
 
 include_once "views/pages/templates/header.php";
 
-$teacher_id = $_SESSION["user_id"];
-
 // Dashboard metrics
 $total_students = count($db->select_all("students"));
 $total_grades = count($db->select_all("grades"));
-$grades_data = $db->select_all("grades");
-$average_grade = $grades_data
-    ? number_format(array_sum(array_column($grades_data, "final_grade")) / $total_grades, 2)
-    : "N/A";
+$total_strands = count($db->select_all("strands"));
+$total_subjects = count($db->select_all("subjects"));
 
-$logs = $db->run_custom_query("
-    SELECT l.*, u.name AS username
-    FROM logs l
-    JOIN users u ON l.user_id = u.id
-    ORDER BY l.created_at DESC
-");
+$logs = $db->run_custom_query("SELECT l.*, u.name AS username FROM logs l JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC");
 ?>
 
 <style>
-    .card h2 {
-        font-size: 2.2rem;
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: linear-gradient(145deg, #ffffff, #f9f9f9);
     }
 
-    .card h6 {
-        font-size: 0.95rem;
-        letter-spacing: 0.5px;
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
 
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
-        transition: background-color 0.2s ease-in-out;
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+    }
+
+    .icon-info {
+        background: rgba(23, 162, 184, 0.15);
+        color: #17a2b8;
+    }
+
+    .icon-primary {
+        background: rgba(0, 123, 255, 0.15);
+        color: #007bff;
+    }
+
+    .icon-warning {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+
+    .icon-success {
+        background: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+    }
+
+    .stat-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-top: 10px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #343a40;
+        margin-bottom: 5px;
+    }
+
+    .stat-sub {
+        font-size: 0.8rem;
+        color: #adb5bd;
     }
 </style>
 
@@ -61,45 +99,60 @@ $logs = $db->run_custom_query("
 
     <!-- Dashboard Summary Cards -->
     <section class="section ">
+        <!-- Cards -->
         <div class="row g-4">
-            <!-- Total Students -->
-            <div class="col-lg-4">
-                <div class="card border rounded-3 shadow-sm h-100 bg-white">
+            <!-- Number of Strands -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div class="mb-2">
-                            <i class="bi bi-people-fill fs-2 text-primary"></i>
+                        <div class="icon-circle icon-info">
+                            <i class="bi bi-diagram-3-fill fs-3"></i>
                         </div>
-                        <h6 class="fw-semibold mb-1 text-secondary">Total Students</h6>
-                        <h2 class="fw-bold text-dark"><?= $total_students ?></h2>
-                        <p class="text-muted small mb-0">Enrolled SHS students</p>
+                        <div class="stat-title">Number of Strands</div>
+                        <div class="stat-value"><?= $total_strands ?></div>
+                        <div class="stat-sub">Available SHS strands</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Students -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle icon-primary">
+                            <i class="bi bi-people-fill fs-3"></i>
+                        </div>
+                        <div class="stat-title">Total Students</div>
+                        <div class="stat-value"><?= $total_students ?></div>
+                        <div class="stat-sub">Enrolled SHS students</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Subjects -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-circle icon-warning">
+                            <i class="bi bi-book-fill fs-3"></i>
+                        </div>
+                        <div class="stat-title">Total Subjects</div>
+                        <div class="stat-value"><?= $total_subjects ?></div>
+                        <div class="stat-sub">Available SHS subjects</div>
                     </div>
                 </div>
             </div>
 
             <!-- Grades Recorded -->
-            <div class="col-lg-4">
-                <div class="card border rounded-3 shadow-sm h-100 bg-white">
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div class="mb-2">
-                            <i class="bi bi-journal-text fs-2 text-success"></i>
+                        <div class="icon-circle icon-success">
+                            <i class="bi bi-journal-text fs-3"></i>
                         </div>
-                        <h6 class="fw-semibold mb-1 text-secondary">Grades Recorded</h6>
-                        <h2 class="fw-bold text-dark"><?= $total_grades ?></h2>
-                        <p class="text-muted small mb-0">Submitted grade entries</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Average Grade -->
-            <div class="col-lg-4">
-                <div class="card border rounded-3 shadow-sm h-100 bg-white">
-                    <div class="card-body text-center p-4">
-                        <div class="mb-2">
-                            <i class="bi bi-bar-chart-line-fill fs-2 text-info"></i>
-                        </div>
-                        <h6 class="fw-semibold mb-1 text-secondary">Average Grade</h6>
-                        <h2 class="fw-bold text-dark"><?= $average_grade ?></h2>
-                        <p class="text-muted small mb-0">Across all subjects</p>
+                        <div class="stat-title">Grades Recorded</div>
+                        <div class="stat-value"><?= $total_grades ?></div>
+                        <div class="stat-sub">Submitted grade entries</div>
                     </div>
                 </div>
             </div>

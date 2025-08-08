@@ -24,7 +24,6 @@
                         <div class="mb-3">
                             <label for="update_subject_category" class="form-label">Category</label>
                             <select class="form-select" id="update_subject_category" required>
-                                <option value="" selected disabled></option>
                                 <option value="core">Core</option>
                                 <option value="applied and specialized">Applied and Specialized</option>
                             </select>
@@ -33,7 +32,6 @@
                         <div class="mb-3">
                             <label for="update_subject_grade_level" class="form-label">Grade Level</label>
                             <select class="form-select" id="update_subject_grade_level" required>
-                                <option value="" selected disabled></option>
                                 <option value="11">11</option>
                                 <option value="12">12</option>
                             </select>
@@ -47,7 +45,6 @@
                                 $strands = $db->select_all("strands", "code", "ASC");
                                 ?>
 
-                                <option value="" selected disabled></option>
                                 <?php if ($strands): ?>
                                     <?php foreach ($strands as $strand): ?>
                                         <option value="<?= $strand["id"] ?>"><?= $strand["code"] ?></option>

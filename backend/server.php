@@ -701,6 +701,140 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($response);
     }
 
+    if (isset($_POST["get_student_subjects"])) {
+        $student_id = $_POST["student_id"];
+
+        $student_data = $db->select_one("students", "id", $student_id);
+
+        $strand_id = $student_data["strand_id"];
+        $grade_level = $student_data["grade_level"];
+
+        $student_subjects = $db->run_custom_query("SELECT * FROM subjects WHERE strand_id = '$strand_id' AND grade_level = '$grade_level'");
+
+        echo json_encode($student_subjects);
+    }
+
+    if (isset($_POST["get_grade_data"])) {
+        $id = $_POST["id"];
+
+        $response = $db->select_one("grades", "id", $id);
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["new_grade"])) {
+        $student_id = $_POST["student_id"];
+        $subject_id = $_POST["subject_id"];
+        $quarter_1 = $_POST["quarter_1"];
+        $quarter_2 = $_POST["quarter_2"];
+        $quarter_3 = $_POST["quarter_3"];
+        $quarter_4 = $_POST["quarter_4"];
+        $final_grade = $_POST["final_grade"];
+        $remarks = $_POST["remarks"];
+
+        $response = false;
+
+        if (!$db->run_custom_query("SELECT id FROM grades WHERE student_id = '$student_id' AND subject_id = '$subject_id'")) {
+            $data = [
+                "uuid" => generate_uuid(),
+                "student_id" => $student_id,
+                "subject_id" => $subject_id,
+                "quarter_1" => $quarter_1,
+                "quarter_2" => $quarter_2,
+                "quarter_3" => $quarter_3,
+                "quarter_4" => $quarter_4,
+                "final_grade" => $final_grade,
+                "remarks" => $remarks,
+                "created_at" => $current_datetime,
+                "updated_at" => $current_datetime,
+            ];
+
+            if ($db->insert("grades", $data)) {
+                $_SESSION["notification"] = [
+                    "title" => "Success!",
+                    "text" => "A new grade has been added successfully.",
+                    "icon" => "success",
+                ];
+
+                insert_log($_SESSION["user_id"], "A new grade has been added successfully.");
+
+                $response = true;
+            }
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["update_grade"])) {
+        $id = $_POST["id"];
+        $student_id = $_POST["student_id"];
+        $subject_id = $_POST["subject_id"];
+        $quarter_1 = $_POST["quarter_1"];
+        $quarter_2 = $_POST["quarter_2"];
+        $quarter_3 = $_POST["quarter_3"];
+        $quarter_4 = $_POST["quarter_4"];
+        $final_grade = $_POST["final_grade"];
+        $remarks = $_POST["remarks"];
+
+        $response = false;
+
+        if (!$db->run_custom_query("SELECT id FROM grades WHERE student_id = '$student_id' AND subject_id = '$subject_id' AND id != '$id'")) {
+            $data = [
+                "student_id" => $student_id,
+                "subject_id" => $subject_id,
+                "quarter_1" => $quarter_1,
+                "quarter_2" => $quarter_2,
+                "quarter_3" => $quarter_3,
+                "quarter_4" => $quarter_4,
+                "final_grade" => $final_grade,
+                "remarks" => $remarks,
+                "updated_at" => $current_datetime,
+            ];
+
+            if ($db->update("grades", $data, "id", $id)) {
+                $_SESSION["notification"] = [
+                    "title" => "Success!",
+                    "text" => "A new grade has been updated successfully.",
+                    "icon" => "success",
+                ];
+
+                insert_log($_SESSION["user_id"], "A new grade has been updated successfully.");
+
+                $response = true;
+            }
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["delete_grade"])) {
+        $id = $_POST["id"];
+
+        $response = false;
+
+        if ($db->delete("grades", "id", $id)) {
+            $_SESSION["notification"] = [
+                "title" => "Success!",
+                "text" => "A grade has been deleted successfully.",
+                "icon" => "success",
+            ];
+
+            insert_log($_SESSION["user_id"], "A grade has been deleted successfully.");
+
+            $response = true;
+        } else {
+            $_SESSION["notification"] = [
+                "title" => "Oops...",
+                "text" => "Failed to delete the grade.",
+                "icon" => "error",
+            ];
+
+            $response = true;
+        }
+
+        echo json_encode($response);
+    }
+
     if (isset($_POST["backup_database"])) {
         $backup = $db->backup("public/backup");
 

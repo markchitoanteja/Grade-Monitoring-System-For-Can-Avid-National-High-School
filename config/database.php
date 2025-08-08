@@ -155,15 +155,15 @@ class Database
             uuid VARCHAR(36) NOT NULL UNIQUE,
             student_id INT(11) NOT NULL,
             subject_id INT(11) NOT NULL,
-            quarter_1 DECIMAL(5,2),
-            quarter_2 DECIMAL(5,2),
-            quarter_3 DECIMAL(5,2),
-            quarter_4 DECIMAL(5,2),
-            final_grade DECIMAL(5,2),
-            remarks VARCHAR(20),
+            quarter_1 DECIMAL(5,2) DEFAULT NULL,
+            quarter_2 DECIMAL(5,2) DEFAULT NULL,
+            quarter_3 DECIMAL(5,2) DEFAULT NULL,
+            quarter_4 DECIMAL(5,2) DEFAULT NULL,
+            final_grade DECIMAL(5,2) DEFAULT NULL,
+            remarks VARCHAR(20) DEFAULT NULL,
             created_at DATETIME NOT NULL,
             updated_at DATETIME NOT NULL,
-            UNIQUE(student_id, subject_id), -- Prevent duplicate entries for the same subject
+            UNIQUE(student_id, subject_id), -- No duplicate grades for the same subject in the same year
             FOREIGN KEY (student_id) REFERENCES students(id)
                 ON DELETE CASCADE
                 ON UPDATE CASCADE,
@@ -480,7 +480,7 @@ class Database
         }
 
         $result = $stmt->get_result();
-        
+
         if ($result) {
             return $result->fetch_all(MYSQLI_ASSOC);
         }

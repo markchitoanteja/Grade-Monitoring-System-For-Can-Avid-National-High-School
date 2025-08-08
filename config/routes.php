@@ -13,7 +13,7 @@ $routes = [
     'backup_and_restore'    => 'views/pages/backup_and_restore.php',
     
     // API Endpoints
-    'server'                => 'api/server.php',
+    'server'                => 'backend/server.php',
 
     // Error Pages
     '403'                   => 'views/errors/403.php',
