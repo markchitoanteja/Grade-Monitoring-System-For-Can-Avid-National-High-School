@@ -11,7 +11,14 @@ $routes = [
     'subjects'              => 'views/pages/subjects.php',
     'grades'                => 'views/pages/grades.php',
     'backup_and_restore'    => 'views/pages/backup_and_restore.php',
-    
+
+    // Student Pages
+    'student'               => 'views/student/login.php',
+    'student/login'         => 'views/student/login.php',
+    'student/dashboard'     => 'views/student/dashboard.php',
+    'student/profile'       => 'views/student/profile.php',
+    'student/grades'        => 'views/student/grades.php',
+
     // API Endpoints
     'server'                => 'backend/server.php',
 

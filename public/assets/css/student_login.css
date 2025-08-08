@@ -1,0 +1,103 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: url('../../../public/assets/img/bg-2.png') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+    font-family: Arial, sans-serif;
+}
+
+/* Dark overlay for readability */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+.login-container {
+    position: relative;
+    z-index: 1;
+    max-width: 400px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    color: white;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+
+.logo-large {
+    max-height: 120px;
+    width: auto;
+    margin-bottom: 1.5rem;
+}
+
+label.form-label {
+    text-align: left;
+    display: block;
+}
+
+.login-container input.form-control {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.login-container input.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.login-container input.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-check-label {
+    color: white;
+}
+
+.forgot-password {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #ced4da;
+    text-decoration: none;
+    text-align: right;
+}
+
+.forgot-password:hover {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+.options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.5rem 0 1.5rem 0;
+}
+
+.forgot-password {
+    font-size: 0.875rem;
+    color: #ced4da;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+.form-check-label {
+    color: white;
+}

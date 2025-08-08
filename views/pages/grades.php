@@ -35,7 +35,7 @@ if (!isset($_SESSION["user_id"])) {
             </div>
             <div class="col-6">
                 <div class="d-flex gap-2 justify-content-end">
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ocr_upload_modal">
+                    <button class="btn btn-success" id="ocr_upload_btn">
                         <i class="bi bi-upload"></i> Upload Image
                     </button>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new_grade_modal">

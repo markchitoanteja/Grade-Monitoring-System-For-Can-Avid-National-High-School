@@ -11,7 +11,7 @@
 
         <script>
             const base_url = "<?= base_url() ?>";
-            const user_id = "<?= $_SESSION["user_id"] ?>";
+            const user_id = "<?= $_SESSION["student_user_id"] ?>";
             const notification = <?= isset($_SESSION["notification"]) ? json_encode($_SESSION["notification"]) : json_encode(null) ?>;
             const current_page = "<?= $current_page ?>";
         </script>
@@ -22,7 +22,7 @@
         <script src="<?= base_url("public/assets/vendor/jquery/jquery.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/vendor/sweetalert2/js/sweetalert2.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/js/main.js") ?>"></script>
-        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.2.3") ?>"></script>
+        <script src="<?= base_url("public/assets/js/student_main_pages.js?v=1.0.0") ?>"></script>
     </body>
 </html>
 

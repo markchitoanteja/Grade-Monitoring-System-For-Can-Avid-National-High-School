@@ -1178,6 +1178,41 @@ jQuery(document).ready(function () {
         calculateFinalGradeUpdate();
     })
 
+    $("#ocr_upload_btn").click(function () {
+        const warningModalHtml = `
+            <div class="modal fade" id="experimentalInfoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content border-info">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title d-flex align-items-center" id="infoModalLabel">
+                                Feature in Experimental Phase
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Hey! This feature is currently in an <strong>experimental phase</strong>. Feel free to try different kinds of inputs to explore its functionality and limits. Your feedback is appreciated!</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" id="gotItBtn">Got it!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if ($("#experimentalInfoModal").length === 0) {
+            $("body").append(warningModalHtml);
+        }
+
+        const infoModal = new bootstrap.Modal(document.getElementById('experimentalInfoModal'));
+        infoModal.show();
+
+        $("#gotItBtn").off('click').on('click', function () {
+            infoModal.hide();
+            $("#ocr_upload_modal").modal("show");
+        });
+    });
+
     function validateFieldUpdate($input) {
         let val = $input.val();
         let feedback = $input.siblings(".invalid-feedback");
@@ -1357,7 +1392,7 @@ $(function () {
         "General Mathematics",
         "Earth Science"
     ];
-    
+
     const appliedSpecializedSubjects = [
         "Empowerment Technologies",
         "Pre-Calculus",
@@ -1369,7 +1404,7 @@ $(function () {
             $('<td>').attr('colspan', 4).addClass('table-secondary fw-bold text-start').css({ background: '#e9ecef', color: '#495057' }).text(title)
         );
     }
-    
+
     function renderBlankGrades() {
         const tbody = $('#ocr_parsed_grades');
         tbody.empty();
@@ -1402,21 +1437,21 @@ $(function () {
     }
 
     $('#ocr_upload_modal').on('show.bs.modal', renderBlankGrades);
-    
+
     $('#ocr_upload_form').on('submit', function (e) {
         e.preventDefault();
-        
+
         const form = this;
         const submitBtn = $('#ocr_submit_btn');
         const parsedGradesTbody = $('#ocr_parsed_grades');
-        
+
         submitBtn.prop('disabled', true);
         submitBtn.html("Please wait...");
-        
+
         const formData = new FormData(form);
-        
+
         formData.append('ocr_upload', 1);
-        
+
         $.ajax({
             url: base_url + 'server',
             type: 'POST',

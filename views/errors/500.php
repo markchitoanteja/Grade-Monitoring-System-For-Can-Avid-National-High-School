@@ -9,6 +9,10 @@ header('Expires: 0');
 
 // Set content type
 header('Content-Type: text/html; charset=UTF-8');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 
 <!DOCTYPE html>
@@ -170,9 +174,8 @@ header('Content-Type: text/html; charset=UTF-8');
         <div class="error-text">
             <h1>500</h1>
             <h2>Internal Server Error</h2>
-            <p>We’re experiencing some technical difficulties. Our team has been notified and is working to fix the problem.
-                You can return to the homepage or contact our support team for assistance.</p>
-            <a href="<?= base_url() ?>" class="btn-home">Back to Home</a>
+            <p>We’re experiencing some technical difficulties. Our team has been notified and is working to fix the problem. You can return to the homepage or contact our support team for assistance.</p>
+            <a href="<?= isset($_SESSION["student_user_id"]) ? base_url('student') : base_url() ?>" class="btn-home">Back to Home</a>
             <a href="mailto:00python23@gmail.com" class="btn-support">Contact Support</a>
         </div>
         <div class="error-image">

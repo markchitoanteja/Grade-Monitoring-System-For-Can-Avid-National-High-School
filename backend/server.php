@@ -189,8 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user) {
             $hashed_password = $user["password"];
+            $user_type = $user["user_type"];
 
-            if (password_verify($password, $hashed_password)) {
+            if (password_verify($password, $hashed_password) && $user_type === "admin") {
                 $_SESSION["user_id"] = $user["id"];
                 $_SESSION["user_type"] = $user["user_type"];
 
@@ -436,42 +437,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $receiver_email = $email;
             $receiver_name = $name;
             $subject = 'Your Student Account Credentials';
+            $loginUrl = base_url('student/login');
             $body = '
                 <!DOCTYPE html>
                 <html>
                 <head>
                 <meta charset="UTF-8">
                 <title>Account Details</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        background-color: #f9f9f9;
+                        padding: 20px;
+                        margin: 0;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: auto;
+                        background: #ffffff;
+                        border: 1px solid #dddddd;
+                        padding: 30px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+                    }
+                    h2 {
+                        color: #2c3e50;
+                        margin-bottom: 20px;
+                        font-weight: 700;
+                    }
+                    p {
+                        color: #555555;
+                        font-size: 16px;
+                    }
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin: 20px 0;
+                        font-size: 16px;
+                    }
+                    td {
+                        padding: 12px 15px;
+                        border: 1px solid #dddddd;
+                    }
+                    td:first-child {
+                        background-color: #f2f2f2;
+                        font-weight: 600;
+                        width: 30%;
+                        color: #333333;
+                    }
+                    .btn {
+                        display: inline-block;
+                        background-color: #3498db;
+                        color: #ffffff !important;
+                        padding: 12px 24px;
+                        border-radius: 5px;
+                        text-decoration: none;
+                        font-weight: 600;
+                        margin-top: 25px;
+                        transition: background-color 0.3s ease;
+                    }
+                    .btn:hover {
+                        background-color: #2980b9;
+                    }
+                    .footer {
+                        margin-top: 30px;
+                        font-size: 14px;
+                        color: #999999;
+                        text-align: center;
+                    }
+                    .text-center {
+                        text-align: center;
+                    }
+                </style>
                 </head>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; padding: 20px;">
-                <div style="max-width: 600px; margin: auto; background: #ffffff; border: 1px solid #dddddd; padding: 30px; border-radius: 6px;">
-                    <h2 style="color: #333333;">Welcome to Your Student Portal</h2>
+                <body>
+                <div class="container">
+                    <h2 class="text-center">Welcome to Your Student Portal</h2>
 
                     <p>Dear ' . htmlspecialchars($name) . ',</p>
 
                     <p>We are pleased to inform you that your account has been successfully created. Below are your login credentials:</p>
 
-                    <table style="border-collapse: collapse; width: 100%; margin-top: 20px; margin-bottom: 20px;">
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #dddddd; background-color: #f2f2f2;"><strong>Username:</strong></td>
-                        <td style="padding: 10px; border: 1px solid #dddddd;">' . htmlspecialchars($username) . '</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #dddddd; background-color: #f2f2f2;"><strong>Password:</strong></td>
-                        <td style="padding: 10px; border: 1px solid #dddddd;">' . htmlspecialchars($password) . '</td>
-                    </tr>
+                    <table>
+                        <tr>
+                            <td>Username:</td>
+                            <td>' . htmlspecialchars($username) . '</td>
+                        </tr>
+                        <tr>
+                            <td>Password:</td>
+                            <td>' . htmlspecialchars($password) . '</td>
+                        </tr>
                     </table>
 
                     <p>For security purposes, please make sure to change your password after your first login.</p>
+
+                    <a href="' . $loginUrl . '" class="btn" target="_blank" rel="noopener noreferrer">Go to Student Login</a>
 
                     <p>If you have any questions or need assistance, do not hesitate to contact our support team.</p>
 
                     <p>Best regards,<br>
                     <strong>Your School IT Support</strong></p>
                 </div>
+                <div class="footer">
+                    &copy; ' . date('Y') . ' Your School. All rights reserved.
+                </div>
                 </body>
                 </html>
             ';
+
 
             if (send_email($receiver_email, $receiver_name, $subject, $body)) {
                 if ($image_file) {
@@ -484,7 +558,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "uuid" => generate_uuid(),
                     "name" => $name,
                     "username" => $lrn,
-                    "password" => password_hash($lrn, PASSWORD_BCRYPT),
+                    "password" => password_hash($password, PASSWORD_BCRYPT),
                     "image" => $image,
                     "user_type" => "student",
                     "created_at" => $current_datetime,
@@ -981,6 +1055,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (isset($_POST["student_login"])) {
+        $username = $_POST["username"];
+        $password = $_POST["password"];
+        $remember_me = $_POST["remember_me"];
+
+        $response = false;
+
+        $user = $db->select_one('users', 'username', $username);
+
+        if ($user) {
+            $hashed_password = $user["password"];
+            $user_type = $user["user_type"];
+
+            if (password_verify($password, $hashed_password) && $user_type === "student") {
+                $_SESSION["student_user_id"] = $user["id"];
+                $_SESSION["user_type"] = $user["user_type"];
+
+                if ($remember_me == "true") {
+                    $_SESSION["student_username"] = $username;
+                    $_SESSION["student_password"] = $password;
+                } else {
+                    unset($_SESSION["student_username"]);
+                    unset($_SESSION["student_password"]);
+                }
+
+                insert_log($_SESSION["student_user_id"], "Successfully logged into the system.");
+
+                $response = true;
+            }
+        }
+
+        echo json_encode($response);
+    }
+
     if (isset($_POST["backup_database"])) {
         $backup = $db->backup("public/backup");
 
@@ -1033,6 +1141,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         insert_log($_SESSION["user_id"], "Logged out successfully.");
 
         unset($_SESSION["user_id"]);
+
+        $_SESSION["notification"] = [
+            "type" => "alert-success bg-success",
+            "message" => "You have been logged out.",
+        ];
+
+        echo json_encode(true);
+    }
+    
+    if (isset($_POST["update_student_account"])) {
+        $id = $_POST["id"];
+        $name = $_POST["name"];
+        $username = $_POST["username"];
+        $password = $_POST["password"];
+        $image_file = isset($_FILES["image_file"]) ? $_FILES["image_file"] : null;
+        $old_password = $_POST["old_password"];
+        $old_image = $_POST["old_image"];
+        $is_new_password = $_POST["is_new_password"];
+        $is_new_image = $_POST["is_new_image"];
+
+        $response = false;
+
+        if ($is_new_password == "true") {
+            $password = password_hash($password, PASSWORD_BCRYPT);
+        } else {
+            $password = $old_password;
+        }
+
+        if ($is_new_image == "true") {
+            $image = upload_image("public/assets/img/uploads/", $image_file);
+        } else {
+            $image = $old_image;
+        }
+
+        $data = [
+            "name" => $name,
+            "username" => $username,
+            "password" => $password,
+            "image" => $image,
+            "updated_at" => $current_datetime,
+        ];
+
+        if ($db->update("users", $data, "id", $id)) {
+            $_SESSION["notification"] = [
+                "title" => "Success!",
+                "text" => "The student data has been updated successfully.",
+                "icon" => "success",
+            ];
+
+            insert_log($_SESSION["student_user_id"], "The student data has been updated successfully.");
+
+            $response = true;
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["student_logout"])) {
+        insert_log($_SESSION["student_user_id"], "Logged out successfully.");
+
+        unset($_SESSION["student_user_id"]);
 
         $_SESSION["notification"] = [
             "type" => "alert-success bg-success",

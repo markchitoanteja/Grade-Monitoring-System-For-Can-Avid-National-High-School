@@ -4,6 +4,10 @@ http_response_code(403);
 
 header('HTTP/1.1 403 Forbidden');
 header('Content-Type: text/html; charset=UTF-8');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +34,7 @@ header('Content-Type: text/html; charset=UTF-8');
 
                 <h2>Access not allowed. You do not have permission to view this page.</h2>
 
-                <a class="btn" href="<?= base_url() ?>">Back to home</a>
+                <a class="btn" href="<?= isset($_SESSION["student_user_id"]) ? base_url('student') : base_url() ?>">Back to home</a>
 
                 <img src="<?= base_url("public/assets/img/not-found.svg") ?>" class="img-fluid py-5" alt="Access Denied">
             </section>
