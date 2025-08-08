@@ -762,7 +762,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(true);
     }
 } else {
-    http_response_code(404);
-
-    header("Location: " . base_url("404.php"));
+    require 'views/errors/404.php';
 }

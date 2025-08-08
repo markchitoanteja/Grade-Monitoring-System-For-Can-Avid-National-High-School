@@ -17,19 +17,21 @@ if (isset($_SESSION["user_id"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login - Grade Monitoring System</title>
+    <title>Grade Monitoring System - Login</title>
 
     <link rel="shortcut icon" href="<?= base_url('public/assets/img/logo.png') ?>" type="image/x-icon">
 
     <link rel="stylesheet" href="<?= base_url('public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= base_url('public/assets/css/login.css?v=1.0.1') ?>">
-</head> 
+</head>
 
 <body>
     <div class="min-vh-100 d-flex align-items-center justify-content-center">
         <div>
             <?php if (isset($_SESSION["notification"])): ?>
                 <div class="alert <?= $_SESSION["notification"]["type"] ?> text-light border-0 text-center" id="notification"><?= $_SESSION["notification"]["message"] ?></div>
+                
+                <?php unset($_SESSION["notification"]) ?>
             <?php endif ?>
 
             <div class="alert alert-danger bg-danger text-light border-0 text-center d-none" id="login_message">Invalid Username or Password</div>
@@ -39,7 +41,7 @@ if (isset($_SESSION["user_id"])) {
                     <div class="row">
                         <!-- Login Form -->
                         <div class="col-7">
-                            <h4 class="mb-3">User Login</h4>
+                            <h4 class="mb-3">Administrator Login</h4>
 
                             <form action="javascript:void(0)" id="login_form">
                                 <div class="form-group mb-3">
@@ -76,9 +78,7 @@ if (isset($_SESSION["user_id"])) {
 
     <script src="<?= base_url('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= base_url('public/assets/vendor/jquery/jquery.min.js') ?>"></script>
-    <script src="<?= base_url('public/assets/js/login.js?v=1.1.3') ?>"></script>
+    <script src="<?= base_url('public/assets/js/login.js?v=1.1.4') ?>"></script>
 </body>
 
 </html>
-
-<?php unset($_SESSION["notification"]) ?>

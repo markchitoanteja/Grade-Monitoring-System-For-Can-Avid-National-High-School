@@ -5,7 +5,6 @@ $routes = [
     'login'                 => 'views/auth/login.php',
 
     // Main Pages
-    'main'                  => 'views/pages/main.php',
     'dashboard'             => 'views/pages/dashboard.php',
     'strands'               => 'views/pages/strands.php',
     'students'              => 'views/pages/students.php',

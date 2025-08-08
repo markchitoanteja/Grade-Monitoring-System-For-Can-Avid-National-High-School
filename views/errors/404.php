@@ -1,3 +1,11 @@
+<?php
+http_response_code(404);
+
+header('Content-Type: text/html; charset=UTF-8');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,9 +27,9 @@
 
             <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
                 <h1>404</h1>
-                
+
                 <h2>The page you are looking for doesn't exist.</h2>
-                
+
                 <a class="btn" href="<?= base_url() ?>">Back to home</a>
 
                 <img src="<?= base_url("public/assets/img/not-found.svg") ?>" class="img-fluid py-5" alt="Page Not Found">

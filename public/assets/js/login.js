@@ -23,7 +23,7 @@ jQuery(document).ready(function () {
             formData.append('login', true);
 
             $.ajax({
-                url:  base_url + 'server',
+                url: base_url + 'server',
                 data: formData,
                 type: 'POST',
                 dataType: 'JSON',
@@ -31,14 +31,12 @@ jQuery(document).ready(function () {
                 contentType: false,
                 success: function (response) {
                     if (response) {
-                        location.href = "main";
+                        location.href = "dashboard";
                     } else {
-                        setTimeout(function () {
-                            $("#login_message").removeClass("d-none");
+                        $("#login_message").removeClass("d-none");
 
-                            $("#login_submit").text("Login");
-                            $("#login_submit").removeAttr("disabled");
-                        }, 1500);
+                        $("#login_submit").text("Login");
+                        $("#login_submit").removeAttr("disabled");
                     }
                 },
                 error: function (_, _, error) {
