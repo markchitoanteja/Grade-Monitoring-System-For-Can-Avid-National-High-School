@@ -92,56 +92,53 @@ $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
 
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
-            <!-- Admin Tabs -->
-            <?php if ($_SESSION["user_type"] == "admin"): ?>
-                <!-- Dashboard -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "dashboard" ? "collapsed" : null ?>" href="dashboard">
-                        <i class="bi bi-grid"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "dashboard" ? "collapsed" : null ?>" href="dashboard">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
 
-                <!-- Strands -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "strands" ? "collapsed" : null ?>" href="strands">
-                        <i class="bi bi-diagram-3"></i>
-                        <span>Strands</span>
-                    </a>
-                </li>
-                
-                <!-- Students -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "students" ? "collapsed" : null ?>" href="students">
-                        <i class="bi bi-people"></i>
-                        <span>Students</span>
-                    </a>
-                </li>
+            <!-- Strands -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "strands" ? "collapsed" : null ?>" href="strands">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Strands</span>
+                </a>
+            </li>
 
-                <!-- Subjects -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "subjects" ? "collapsed" : null ?>" href="subjects">
-                        <i class="bi bi-book"></i>
-                        <span>Subjects</span>
-                    </a>
-                </li>
-                
-                <!-- Grades -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "grades" ? "collapsed" : null ?>" href="grades">
-                        <i class="bi bi-bar-chart"></i>
-                        <span>Grades</span>
-                    </a>
-                </li>
+            <!-- Students -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "students" ? "collapsed" : null ?>" href="students">
+                    <i class="bi bi-people"></i>
+                    <span>Students</span>
+                </a>
+            </li>
 
-                <!-- Backup and Restore -->
-                <li class="nav-item">
-                    <a class="nav-link <?= $current_page != "backup_and_restore" ? "collapsed" : null ?>" href="backup_and_restore">
-                        <i class="bi bi-database"></i>
-                        <span>Backup and Restore</span>
-                    </a>
-                </li>
-            <?php endif ?>
+            <!-- Subjects -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "subjects" ? "collapsed" : null ?>" href="subjects">
+                    <i class="bi bi-book"></i>
+                    <span>Subjects</span>
+                </a>
+            </li>
+
+            <!-- Grades -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "grades" ? "collapsed" : null ?>" href="grades">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Grades</span>
+                </a>
+            </li>
+
+            <!-- Backup and Restore -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "backup_and_restore" ? "collapsed" : null ?>" href="backup_and_restore">
+                    <i class="bi bi-database"></i>
+                    <span>Backup and Restore</span>
+                </a>
+            </li>
 
             <!-- Logout -->
             <li class="nav-item">

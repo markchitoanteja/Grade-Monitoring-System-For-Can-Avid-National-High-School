@@ -163,11 +163,11 @@ function displayGradeOrDash($grade)
     <div class="pagetitle">
         <div class="row">
             <div class="col-lg-8">
-                <h1 class="fs-4 mb-1">My Profile</h1>
+                <h1 class="fs-4 mb-1">My Grades</h1>
                 <nav>
                     <ol class="breadcrumb small">
                         <li class="breadcrumb-item"><a href="<?= base_url('student/dashboard') ?>">Home</a></li>
-                        <li class="breadcrumb-item active">Profile</li>
+                        <li class="breadcrumb-item active">Grades</li>
                     </ol>
                 </nav>
             </div>

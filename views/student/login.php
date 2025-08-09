@@ -74,7 +74,7 @@ if (isset($_SESSION["student_user_id"])) {
 
     <script src="<?= base_url('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= base_url('public/assets/vendor/jquery/jquery.min.js') ?>"></script>
-    <script src="<?= base_url('public/assets/js/student_login.js?v=1.0') ?>"></script>
+    <script src="<?= base_url('public/assets/js/student_login.js?v=1.0.1') ?>"></script>
 </body>
 
 </html>

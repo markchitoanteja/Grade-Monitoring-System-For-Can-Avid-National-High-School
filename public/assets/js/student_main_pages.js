@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    preventDevTools(false);
+    preventDevTools(true);
     preventMobileAccess(false);
 
     if (notification) {
@@ -238,41 +238,7 @@ $(document).ready(function () {
     $("#update_profile_email").keydown(function () {
         $("#update_profile_email").removeClass("is-invalid");
         $("#update_profile_email").next(".invalid-feedback").remove();
-    });
-
-    function is_form_loading(modal_id, is_loading) {
-        const $modal = $(modal_id);
-
-        if (is_loading) {
-            $(".actual-form").addClass("d-none");
-            $(".loading").removeClass("d-none");
-
-            $modal.on('keydown.bs.modal', function (e) {
-                if (e.key === "Escape") {
-                    e.stopImmediatePropagation();
-                    e.preventDefault();
-                }
-            });
-
-            $modal.on('click.dismiss.bs.modal', function (e) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-            });
-
-            $modal.find('[data-bs-dismiss="modal"]').attr('disabled', true);
-            $modal.find('.btn-close').attr('disabled', true);
-
-        } else {
-            $(".actual-form").removeClass("d-none");
-            $(".loading").addClass("d-none");
-
-            $modal.off('keydown.bs.modal');
-            $modal.off('click.dismiss.bs.modal');
-
-            $modal.find('[data-bs-dismiss="modal"]').removeAttr('disabled');
-            $modal.find('.btn-close').removeAttr('disabled');
-        }
-    }
+    })
 
     function preventDevTools(enable) {
         if (!enable) return;

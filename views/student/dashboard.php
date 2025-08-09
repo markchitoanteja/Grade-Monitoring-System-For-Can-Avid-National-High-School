@@ -44,7 +44,7 @@ INNER JOIN subjects subj ON g.subject_id = subj.id
 INNER JOIN students st ON g.student_id = st.id
 WHERE st.account_id = " . intval($_SESSION['student_user_id']) . "
 ORDER BY g.updated_at DESC
-LIMIT 10
+LIMIT 5
 ";
 
 $recent_grades = $db->run_custom_query($sql);

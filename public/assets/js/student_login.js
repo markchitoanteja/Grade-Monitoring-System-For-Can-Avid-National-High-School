@@ -1,5 +1,5 @@
 jQuery(document).ready(function () {
-    preventDevTools(false);
+    preventDevTools(true);
     preventMobileAccess(false);
 
     $("#student_login_form").submit(function () {
