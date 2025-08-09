@@ -185,11 +185,14 @@ class Database
             user_id INT(11) NOT NULL,
             activity TEXT NOT NULL,
             created_at DATETIME NOT NULL,
-            updated_at DATETIME NOT NULL
+            updated_at DATETIME NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
         )";
 
         if (!$this->connection->query($sql) === TRUE) {
-            die("Error creating users table: " . $this->connection->error);
+            die("Error creating logs table: " . $this->connection->error);
         }
     }
 

@@ -1141,6 +1141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         insert_log($_SESSION["user_id"], "Logged out successfully.");
 
         unset($_SESSION["user_id"]);
+        unset($_SESSION["user_type"]);
+        unset($_SESSION["student_user_id"]);
 
         $_SESSION["notification"] = [
             "type" => "alert-success bg-success",
@@ -1268,6 +1270,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST["student_logout"])) {
         insert_log($_SESSION["student_user_id"], "Logged out successfully.");
 
+        unset($_SESSION["user_id"]);
+        unset($_SESSION["user_type"]);
         unset($_SESSION["student_user_id"]);
 
         $_SESSION["notification"] = [
