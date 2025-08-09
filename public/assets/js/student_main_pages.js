@@ -183,6 +183,63 @@ $(document).ready(function () {
         }
     })
 
+    $("#update_profile_form").submit(function () {
+        const first_name = $("#update_profile_first_name").val();
+        const middle_name = $("#update_profile_middle_name").val();
+        const last_name = $("#update_profile_last_name").val();
+        const birthday = $("#update_profile_birthday").val();
+        const sex = $("#update_profile_sex").val();
+        const email = $("#update_profile_email").val();
+        const address = $("#update_profile_address").val();
+
+        $("#update_profile_btn").text("Please Wait..");
+        $("#update_profile_btn").attr("disabled", true);
+
+        var formData = new FormData();
+
+        formData.append('first_name', first_name);
+        formData.append('middle_name', middle_name);
+        formData.append('last_name', last_name);
+        formData.append('birthday', birthday);
+        formData.append('sex', sex);
+        formData.append('email', email);
+        formData.append('address', address);
+
+        formData.append('update_student_profile', true);
+
+        $.ajax({
+            url: base_url + 'server',
+            data: formData,
+            type: 'POST',
+            dataType: 'JSON',
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response) {
+                    location.reload();
+                } else {
+                    // Reset button state
+                    $("#update_profile_btn").text("Save changes");
+                    $("#update_profile_btn").removeAttr("disabled");
+
+                    // Email error UI
+                    $("#update_profile_email").addClass("is-invalid");
+                    if (!$("#update_profile_email").next(".invalid-feedback").length) {
+                        $("#update_profile_email").after('<div class="invalid-feedback">Email already exists</div>');
+                    }
+                }
+            },
+            error: function (_, _, error) {
+                console.error(error);
+            }
+        });
+    })
+
+    $("#update_profile_email").keydown(function () {
+        $("#update_profile_email").removeClass("is-invalid");
+        $("#update_profile_email").next(".invalid-feedback").remove();
+    });
+
     function is_form_loading(modal_id, is_loading) {
         const $modal = $(modal_id);
 

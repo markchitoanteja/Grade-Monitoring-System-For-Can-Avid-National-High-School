@@ -214,7 +214,7 @@
   datatables.forEach(datatable => {
     new simpleDatatables.DataTable(datatable, {
       sortable: false, // Disable sorting
-      perPage: 5, // Disable entries per page
+      perPage: 10, // Disable entries per page
       paging: true // Disable pagination completely
     });
   });

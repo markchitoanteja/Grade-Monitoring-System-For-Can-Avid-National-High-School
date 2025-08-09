@@ -64,8 +64,8 @@ if (!isset($_SESSION["user_id"])) {
                                             <td title="<?= htmlspecialchars($strand['name']) ?>" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                                 <?= htmlspecialchars($strand['name']) ?>
                                             </td>
-                                            <td title="<?= htmlspecialchars($strand['description']) ?>" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                <?= htmlspecialchars($strand['description']) ?>
+                                            <td class="<?= $strand['description'] != "" ? "" : "text-muted" ?>" title="<?= htmlspecialchars($strand['description']) ?>" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <?= $strand['description'] != "" ? htmlspecialchars($strand['description']) : "Not Yet Available" ?>
                                             </td>
                                             
                                             <td class="text-center">

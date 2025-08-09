@@ -68,7 +68,7 @@ if (!isset($_SESSION["user_id"])) {
                                         <tr>
                                             <td><?= $subject["name"] ?></td>
                                             <td><?= $subject["category"] == "applied and specialized" ? "Applied and Specialized" : "Core" ?></td>
-                                            <td><?= $subject["grade_level"] ?></td>
+                                            <td>Grade <?= $subject["grade_level"] ?></td>
                                             <td><?= $strand["code"] ?></td>
                                             <td class="text-center">
                                                 <i class="bi bi-pencil-fill text-primary me-1 update_subject_btn" role="button" data-id="<?= $subject["id"] ?>"></i>

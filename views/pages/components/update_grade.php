@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Student Grade</h5>
+                <h5 class="modal-title">Update Student Grade</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="javascript:void(0)" id="update_grade_form">
@@ -28,7 +28,7 @@
                                     <?php if ($students): ?>
                                         <?php foreach ($students as $student): ?>
                                             <option value="<?= $student["id"] ?>">
-                                                <?= $student["last_name"] . ", " . $student["first_name"] . " " . $student["middle_name"] ?>
+                                                <?= htmlspecialchars($student["last_name"] . ", " . $student["first_name"] . " " . $student["middle_name"]) ?>
                                             </option>
                                         <?php endforeach ?>
                                     <?php endif ?>
@@ -43,29 +43,46 @@
                             </div>
                         </div>
 
-                        <!-- First Semester -->
-                        <h6 class="text-primary border-bottom pb-2 mb-3">First Semester Grades</h6>
-                        <div class="row mb-4">
-                            <div class="col-lg-6">
-                                <label for="update_grade_quarter_1" class="fw-semibold">Quarter 1</label>
-                                <input type="number" min="0" max="100" step="0.01" class="form-control" id="update_grade_quarter_1" required>
+                        <!-- Semester Selection -->
+                        <h6 class="text-primary border-bottom pb-2 mb-3">Select Semester</h6>
+                        <div class="mb-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="update_grade_semester" id="update_semester_1" value="1" required checked>
+                                <label class="form-check-label" for="update_semester_1">First Semester</label>
                             </div>
-                            <div class="col-lg-6">
-                                <label for="update_grade_quarter_2" class="fw-semibold">Quarter 2</label>
-                                <input type="number" min="0" max="100" step="0.01" class="form-control" id="update_grade_quarter_2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="update_grade_semester" id="update_semester_2" value="2" required>
+                                <label class="form-check-label" for="update_semester_2">Second Semester</label>
+                            </div>
+                        </div>
+
+                        <!-- First Semester -->
+                        <div id="update_first_semester_grades">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">First Semester Grades</h6>
+                            <div class="row mb-4">
+                                <div class="col-lg-6">
+                                    <label for="update_grade_quarter_1" class="fw-semibold">Quarter 1</label>
+                                    <input type="number" min="0" max="100" step="0.01" class="form-control update-semester-quarter" id="update_grade_quarter_1">
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="update_grade_quarter_2" class="fw-semibold">Quarter 2</label>
+                                    <input type="number" min="0" max="100" step="0.01" class="form-control update-semester-quarter" id="update_grade_quarter_2">
+                                </div>
                             </div>
                         </div>
 
                         <!-- Second Semester -->
-                        <h6 class="text-primary border-bottom pb-2 mb-3">Second Semester Grades</h6>
-                        <div class="row mb-4">
-                            <div class="col-lg-6">
-                                <label for="update_grade_quarter_3" class="fw-semibold">Quarter 3</label>
-                                <input type="number" min="0" max="100" step="0.01" class="form-control" id="update_grade_quarter_3">
-                            </div>
-                            <div class="col-lg-6">
-                                <label for="update_grade_quarter_4" class="fw-semibold">Quarter 4</label>
-                                <input type="number" min="0" max="100" step="0.01" class="form-control" id="update_grade_quarter_4">
+                        <div id="update_second_semester_grades" style="display:none;">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">Second Semester Grades</h6>
+                            <div class="row mb-4">
+                                <div class="col-lg-6">
+                                    <label for="update_grade_quarter_3" class="fw-semibold">Quarter 3</label>
+                                    <input type="number" min="0" max="100" step="0.01" class="form-control update-semester-quarter" id="update_grade_quarter_3" disabled>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="update_grade_quarter_4" class="fw-semibold">Quarter 4</label>
+                                    <input type="number" min="0" max="100" step="0.01" class="form-control update-semester-quarter" id="update_grade_quarter_4" disabled>
+                                </div>
                             </div>
                         </div>
 
@@ -86,7 +103,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="update_grade_submit">Add Grade</button>
+                    <button type="submit" class="btn btn-primary" id="update_grade_submit">Update Grade</button>
                 </div>
             </form>
         </div>

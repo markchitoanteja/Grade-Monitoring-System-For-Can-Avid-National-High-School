@@ -3,7 +3,16 @@ $db = new Database();
 
 $current_page = basename($_SERVER['REQUEST_URI']);
 
-$user_data = $db->select_one("users", "id", $_SESSION["student_user_id"]);
+$sql = "SELECT 
+    users.id AS user_id, users.uuid AS user_uuid, users.name AS name, users.username, users.image, users.user_type, 
+    students.id AS student_id, students.uuid AS student_uuid, students.lrn, students.strand_id, students.grade_level, students.section, students.first_name, students.middle_name, students.last_name, students.birthday, students.sex, students.email, students.address, students.created_at AS student_created_at, students.updated_at AS student_updated_at,
+    strands.code AS strand_code, strands.name AS strand_name
+    FROM students
+    INNER JOIN users ON students.account_id = users.id
+    INNER JOIN strands ON students.strand_id = strands.id
+    WHERE users.id = " . intval($_SESSION['student_user_id']);
+
+$user_data = $db->run_custom_query($sql)[0];
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +108,7 @@ $user_data = $db->select_one("users", "id", $_SESSION["student_user_id"]);
                     <span>Dashboard</span>
                 </a>
             </li>
-            
+
             <!-- Profile -->
             <li class="nav-item">
                 <a class="nav-link <?= $current_page != "profile" ? "collapsed" : null ?>" href="profile">
@@ -107,7 +116,7 @@ $user_data = $db->select_one("users", "id", $_SESSION["student_user_id"]);
                     <span>My Profile</span>
                 </a>
             </li>
-            
+
             <!-- Grades -->
             <li class="nav-item">
                 <a class="nav-link <?= $current_page != "grades" ? "collapsed" : null ?>" href="grades">

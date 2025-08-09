@@ -830,11 +830,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($db->update("subjects", $data, "id", $id)) {
                 $_SESSION["notification"] = [
                     "title" => "Success!",
-                    "text" => "A new subject has been updated successfully.",
+                    "text" => "A subject has been updated successfully.",
                     "icon" => "success",
                 ];
 
-                insert_log($_SESSION["user_id"], "A new subject has been updated successfully.");
+                insert_log($_SESSION["user_id"], "A subject has been updated successfully.");
 
                 $response = true;
             }
@@ -964,11 +964,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($db->update("grades", $data, "id", $id)) {
                 $_SESSION["notification"] = [
                     "title" => "Success!",
-                    "text" => "A new grade has been updated successfully.",
+                    "text" => "A grade has been updated successfully.",
                     "icon" => "success",
                 ];
 
-                insert_log($_SESSION["user_id"], "A new grade has been updated successfully.");
+                insert_log($_SESSION["user_id"], "A grade has been updated successfully.");
 
                 $response = true;
             }
@@ -1149,7 +1149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         echo json_encode(true);
     }
-    
+
     if (isset($_POST["update_student_account"])) {
         $id = $_POST["id"];
         $name = $_POST["name"];
@@ -1196,6 +1196,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         echo json_encode($response);
+    }
+
+    if (isset($_POST["update_student_profile"])) {
+        $first_name = $_POST["first_name"];
+        $middle_name = $_POST["middle_name"];
+        $last_name = $_POST["last_name"];
+        $birthday = $_POST["birthday"];
+        $sex = $_POST["sex"];
+        $email = $_POST["email"];
+        $address = $_POST["address"];
+
+        $response = false;
+
+        if (!$db->run_custom_query("SELECT * FROM students WHERE email = '$email' AND account_id != " . $_SESSION["student_user_id"])) {
+            if (!empty($middle_name)) {
+                $middle_initial = strtoupper(substr($middle_name, 0, 1)) . '.';
+
+                $name = $first_name . ' ' . $middle_initial . ' ' . $last_name;
+            } else {
+                $name = $first_name . ' ' . $last_name;
+            }
+
+            $db->update("users", ["name" => $name, "updated_at" => $current_datetime], "id", $_SESSION["student_user_id"]);
+
+            $data = [
+                "first_name" => $first_name,
+                "middle_name" => $middle_name,
+                "last_name" => $last_name,
+                "birthday" => $birthday,
+                "sex" => $sex,
+                "email" => $email,
+                "address" => $address,
+                "updated_at" => $current_datetime,
+            ];
+
+            if ($db->update("students", $data, "account_id", $_SESSION["student_user_id"])) {
+                $_SESSION["notification"] = [
+                    "title" => "Success!",
+                    "text" => "The student profile has been updated successfully.",
+                    "icon" => "success",
+                ];
+
+                insert_log($_SESSION["student_user_id"], "The student profile has been updated successfully.");
+
+                $response = true;
+            }
+        }
+
+        echo json_encode($response);
+    }
+
+    if (isset($_POST["clear_logs"])) {
+        if ($db->run_custom_query("DELETE FROM logs")) {
+            $_SESSION["notification"] = [
+                "title" => "Success!",
+                "text" => "All logs have been cleared successfully.",
+                "icon" => "success",
+            ];
+        } else {
+            $_SESSION["notification"] = [
+                "title" => "Error!",
+                "text" => "Failed to clear logs.",
+                "icon" => "error",
+            ];
+        }
+
+        echo json_encode(true);
     }
 
     if (isset($_POST["student_logout"])) {

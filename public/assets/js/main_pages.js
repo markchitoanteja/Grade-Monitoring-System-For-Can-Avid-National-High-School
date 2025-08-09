@@ -1,6 +1,8 @@
-jQuery(document).ready(function () {
-    preventDevTools(false);
+$(document).ready(function () {
+    preventDevTools(true);
     preventMobileAccess(true);
+
+    enable_first_semester();
 
     if (notification) {
         Swal.fire({
@@ -952,10 +954,6 @@ jQuery(document).ready(function () {
         });
     })
 
-    $("#new_grade_quarter_1, #new_grade_quarter_2, #new_grade_quarter_3, #new_grade_quarter_4").on("input", function () {
-        calculateFinalGrade();
-    })
-
     $("#new_grade_form").submit(function () {
         const student_id = $("#new_grade_student_id").val();
         const subject_id = $("#new_grade_subject").val();
@@ -1009,17 +1007,57 @@ jQuery(document).ready(function () {
         });
     })
 
-    $("#update_grade_form").submit(function () {
+    $("#update_grade_form").submit(function (e) {
+        e.preventDefault(); // prevent default submission
+
+        // Clear previous error message
+        $("#update_grade_error").addClass("d-none").text("");
+
         const id = $("#update_grade_id").val();
         const student_id = $("#update_grade_student_id").val();
         const subject_id = $("#update_grade_subject").val();
-        const quarter_1 = $("#update_grade_quarter_1").val();
-        const quarter_2 = $("#update_grade_quarter_2").val();
-        const quarter_3 = $("#update_grade_quarter_3").val();
-        const quarter_4 = $("#update_grade_quarter_4").val();
+        const quarter_1 = $("#update_grade_quarter_1").val().trim();
+        const quarter_2 = $("#update_grade_quarter_2").val().trim();
+        const quarter_3 = $("#update_grade_quarter_3").val().trim();
+        const quarter_4 = $("#update_grade_quarter_4").val().trim();
         const final_grade = $("#update_grade_final").val();
         const remarks = $("#update_grade_remarks").val();
 
+        // Collect quarters with input
+        const quartersWithValues = [];
+        if (quarter_1 !== "") quartersWithValues.push("quarter_1");
+        if (quarter_2 !== "") quartersWithValues.push("quarter_2");
+        if (quarter_3 !== "") quartersWithValues.push("quarter_3");
+        if (quarter_4 !== "") quartersWithValues.push("quarter_4");
+
+        // Validation: max 2 grades only
+        if (quartersWithValues.length === 0) {
+            $("#update_grade_error").removeClass("d-none").text("Please enter at least one quarter grade.");
+            return false;
+        }
+
+        if (quartersWithValues.length > 2) {
+            $("#update_grade_error").removeClass("d-none").text("You can only submit grades for a maximum of two quarters.");
+            return false;
+        }
+
+        // Validation: if 2 grades, must be Q1 & Q2 OR Q3 & Q4
+        if (quartersWithValues.length === 2) {
+            const qSet = new Set(quartersWithValues);
+            const firstSemesterSet = new Set(["quarter_1", "quarter_2"]);
+            const secondSemesterSet = new Set(["quarter_3", "quarter_4"]);
+
+            // Check if qSet matches either firstSemesterSet or secondSemesterSet
+            const isFirstSem = [...qSet].every(q => firstSemesterSet.has(q)) && quartersWithValues.length === 2;
+            const isSecondSem = [...qSet].every(q => secondSemesterSet.has(q)) && quartersWithValues.length === 2;
+
+            if (!(isFirstSem || isSecondSem)) {
+                $("#update_grade_error").removeClass("d-none").text("Grades must be for Quarter 1 and 2 OR Quarter 3 and 4 only.");
+                return false;
+            }
+        }
+
+        // If validation passes, continue with submission
         $("#update_grade_submit").text("Please Wait..");
         $("#update_grade_submit").attr("disabled", true);
 
@@ -1068,16 +1106,12 @@ jQuery(document).ready(function () {
         const id = $(this).data("id");
 
         $("#update_grade_submit").attr("disabled", true).text("Please Wait..");
-
         is_form_loading("#update_grade_modal", true);
 
         $("#update_grade_id").val(id);
         $("#update_grade_modal").modal("show");
 
-        $("#update_grade_id").val(id);
-
         var formData = new FormData();
-
         formData.append('id', id);
         formData.append('get_grade_data', true);
 
@@ -1116,13 +1150,64 @@ jQuery(document).ready(function () {
                         // Step 3: Select the subject from database
                         $subjectSelect.val(response.subject_id);
 
-                        // Step 4: Fill the rest of the fields
-                        $("#update_grade_quarter_1").val(response.quarter_1 == "0.00" ? "" : response.quarter_1);
-                        $("#update_grade_quarter_2").val(response.quarter_2 == "0.00" ? "" : response.quarter_2);
-                        $("#update_grade_quarter_3").val(response.quarter_3 == "0.00" ? "" : response.quarter_3);
-                        $("#update_grade_quarter_4").val(response.quarter_4 == "0.00" ? "" : response.quarter_4);
+                        // Step 4: Determine semester and show appropriate quarters
+                        const q1 = parseFloat(response.quarter_1);
+                        const q2 = parseFloat(response.quarter_2);
+                        const q3 = parseFloat(response.quarter_3);
+                        const q4 = parseFloat(response.quarter_4);
+
+                        // Helper function to check if value is valid grade
+                        function hasGrade(val) {
+                            return !isNaN(val) && val > 0;
+                        }
+
+                        if (hasGrade(q1) || hasGrade(q2)) {
+                            // Select first semester radio button
+                            $('input[name="update_grade_semester"][value="1"]').prop('checked', true).trigger('change');
+
+                            // Enable and show first semester, disable and hide second semester
+                            $("#first_semester_grades").show();
+                            $("#second_semester_grades").hide();
+
+                            $("#update_grade_quarter_1, #update_grade_quarter_2").prop("disabled", false);
+                            $("#update_grade_quarter_3, #update_grade_quarter_4").prop("disabled", true).val("");
+
+                            // Set quarter grades
+                            $("#update_grade_quarter_1").val(q1 === 0 ? "" : q1.toFixed(2));
+                            $("#update_grade_quarter_2").val(q2 === 0 ? "" : q2.toFixed(2));
+
+                        } else if (hasGrade(q3) || hasGrade(q4)) {
+                            // Select second semester radio button
+                            $('input[name="update_grade_semester"][value="2"]').prop('checked', true).trigger('change');
+
+                            // Enable and show second semester, disable and hide first semester
+                            $("#second_semester_grades").show();
+                            $("#first_semester_grades").hide();
+
+                            $("#update_grade_quarter_3, #update_grade_quarter_4").prop("disabled", false);
+                            $("#update_grade_quarter_1, #update_grade_quarter_2").prop("disabled", true).val("");
+
+                            // Set quarter grades
+                            $("#update_grade_quarter_3").val(q3 === 0 ? "" : q3.toFixed(2));
+                            $("#update_grade_quarter_4").val(q4 === 0 ? "" : q4.toFixed(2));
+
+                        } else {
+                            // Default state (first semester, empty)
+                            $('input[name="update_grade_semester"][value="1"]').prop('checked', true).trigger('change');
+
+                            $("#first_semester_grades").show();
+                            $("#second_semester_grades").hide();
+
+                            $("#update_grade_quarter_1, #update_grade_quarter_2").prop("disabled", false).val("");
+                            $("#update_grade_quarter_3, #update_grade_quarter_4").prop("disabled", true).val("");
+                        }
+
+                        // Set final grade and remarks, clear if 0.00
                         $("#update_grade_final").val(response.final_grade == "0.00" ? "" : response.final_grade);
                         $("#update_grade_remarks").val(response.remarks);
+
+                        // Trigger calculation in case fields were populated to update final grade & remarks display
+                        calculateUpdateFinalGrade();
 
                         $("#update_grade_submit").removeAttr("disabled").text("Save changes");
                         is_form_loading("#update_grade_modal", false);
@@ -1174,10 +1259,6 @@ jQuery(document).ready(function () {
         });
     })
 
-    $("#update_grade_quarter_1, #update_grade_quarter_2, #update_grade_quarter_3, #update_grade_quarter_4").on("input", function () {
-        calculateFinalGradeUpdate();
-    })
-
     $("#ocr_upload_btn").click(function () {
         const warningModalHtml = `
             <div class="modal fade" id="experimentalInfoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
@@ -1211,65 +1292,162 @@ jQuery(document).ready(function () {
             infoModal.hide();
             $("#ocr_upload_modal").modal("show");
         });
-    });
+    })
 
-    function validateFieldUpdate($input) {
-        let val = $input.val();
-        let feedback = $input.siblings(".invalid-feedback");
+    $('input[name="new_grade_semester"]').on('change', function () {
+        const semester = $(this).val();
 
-        if (val !== "" && (val < 0 || val > 100)) {
-            $input.addClass("is-invalid");
+        if (semester === "1") {
+            $("#first_semester_grades").show();
+            $("#second_semester_grades").hide();
 
-            if (feedback.length === 0) {
-                $input.after('<div class="invalid-feedback">Grade must be between 0 and 100.</div>');
-            }
-            return false;
-        } else {
-            $input.removeClass("is-invalid");
-            feedback.remove();
-            return true;
+            // Enable Q1 & Q2, disable & clear Q3 & Q4
+            $("#new_grade_quarter_1, #new_grade_quarter_2").prop("disabled", false);
+            $("#new_grade_quarter_3, #new_grade_quarter_4").prop("disabled", true).val("");
+        } else if (semester === "2") {
+            $("#first_semester_grades").hide();
+            $("#second_semester_grades").show();
+
+            // Enable Q3 & Q4, disable & clear Q1 & Q2
+            $("#new_grade_quarter_3, #new_grade_quarter_4").prop("disabled", false);
+            $("#new_grade_quarter_1, #new_grade_quarter_2").prop("disabled", true).val("");
         }
-    }
 
-    function calculateFinalGradeUpdate() {
-        let q1 = parseFloat($("#update_grade_quarter_1").val());
-        let q2 = parseFloat($("#update_grade_quarter_2").val());
-        let q3 = parseFloat($("#update_grade_quarter_3").val());
-        let q4 = parseFloat($("#update_grade_quarter_4").val());
+        clearFinalGrade();
+    })
 
-        // Validate all fields
-        let allValid = true;
-        $("#update_grade_quarter_1, #update_grade_quarter_2, #update_grade_quarter_3, #update_grade_quarter_4").each(function () {
-            if (!validateFieldUpdate($(this))) {
-                allValid = false;
+    $(".semester-quarter").on("input", function () {
+        validateGradeInput($(this));
+        calculateFinalGrade();
+    })
+
+    $('input[name="update_grade_semester"]').on('change', function () {
+        const semester = $(this).val();
+
+        if (semester === "1") {
+            $("#update_first_semester_grades").show();
+            $("#update_second_semester_grades").hide();
+
+            // Enable Q1 & Q2
+            $("#update_grade_quarter_1, #update_grade_quarter_2").prop("disabled", false);
+            // Disable Q3 & Q4 without clearing values
+            $("#update_grade_quarter_3, #update_grade_quarter_4").prop("disabled", true);
+        } else if (semester === "2") {
+            $("#update_first_semester_grades").hide();
+            $("#update_second_semester_grades").show();
+
+            // Enable Q3 & Q4
+            $("#update_grade_quarter_3, #update_grade_quarter_4").prop("disabled", false);
+            // Disable Q1 & Q2 without clearing values
+            $("#update_grade_quarter_1, #update_grade_quarter_2").prop("disabled", true);
+        }
+
+        calculateUpdateFinalGrade(); // Recalculate final grade for the visible semester inputs
+    })
+
+    $(".update-semester-quarter").on("input", function () {
+        validateGradeInput($(this));
+        calculateUpdateFinalGrade();
+    })
+
+    $("#clear_logs_btn").click(function () {
+        Swal.fire({
+            title: "Clear Logs",
+            text: "Are you sure you want to clear all logs?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, clear logs!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+
+                formData.append('clear_logs', true);
+
+                $.ajax({
+                    url: base_url + 'server',
+                    data: formData,
+                    type: 'POST',
+                    dataType: 'JSON',
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response) {
+                            location.reload();
+                        }
+                    },
+                    error: function (_, _, error) {
+                        console.error(error);
+                    }
+                });
             }
         });
+    })
 
-        if (!allValid) {
-            $("#update_grade_final").val("");
-            $("#update_grade_remarks").val("");
+    function calculateUpdateFinalGrade() {
+        const semester = $("input[name='update_grade_semester']:checked").val();
+
+        let quarters = [];
+        if (semester === "1") {
+            quarters = [
+                $("#update_grade_quarter_1"),
+                $("#update_grade_quarter_2"),
+            ];
+        } else if (semester === "2") {
+            quarters = [
+                $("#update_grade_quarter_3"),
+                $("#update_grade_quarter_4"),
+            ];
+        } else {
+            clearUpdateFinalGrade();
             return;
         }
 
-        // Only calculate if all values are filled and valid
-        if (!isNaN(q1) && !isNaN(q2) && !isNaN(q3) && !isNaN(q4)) {
-            let finalGrade = (q1 + q2 + q3 + q4) / 4;
-            $("#update_grade_final").val(finalGrade.toFixed(2));
-
-            $("#update_grade_remarks").val(finalGrade >= 75 ? "PASSED" : "FAILED");
-        } else {
-            $("#update_grade_final").val("");
-            $("#update_grade_remarks").val("");
+        // Validate only non-empty inputs
+        for (const $q of quarters) {
+            const val = $q.val().trim();
+            if (val !== "" && !validateGradeInput($q)) {
+                clearUpdateFinalGrade();
+                return;
+            }
         }
+
+        // Check if all enabled quarters have values
+        if (quarters.some($q => $q.val().trim() === "")) {
+            clearUpdateFinalGrade();
+            return;
+        }
+
+        // All quarters valid and filled -> calculate average
+        const quarterVals = quarters.map($q => parseFloat($q.val()));
+
+        const avg = quarterVals.reduce((a, b) => a + b, 0) / quarterVals.length;
+
+        $("#update_grade_final").val(avg.toFixed(2)).attr("placeholder", "");
+        $("#update_grade_remarks").val(avg >= 75 ? "PASSED" : "FAILED").attr("placeholder", "");
     }
 
-    function validateField($input) {
-        let val = $input.val();
-        let feedback = $input.siblings(".invalid-feedback");
+    function clearUpdateFinalGrade() {
+        $("#update_grade_final").val("").attr("placeholder", "Not Yet Available");
+        $("#update_grade_remarks").val("").attr("placeholder", "Not Yet Available");
+    }
 
-        if (val !== "" && (val < 0 || val > 100)) {
+    function validateGradeInput($input) {
+        const val = $input.val().trim();
+
+        // If empty, skip validation (no error shown)
+        if (val === "") {
+            $input.removeClass("is-invalid");
+            $input.siblings(".invalid-feedback").remove();
+            return true;
+        }
+
+        const numVal = parseFloat(val);
+        const feedback = $input.siblings(".invalid-feedback");
+
+        if (isNaN(numVal) || numVal < 0 || numVal > 100) {
             $input.addClass("is-invalid");
-
             if (feedback.length === 0) {
                 $input.after('<div class="invalid-feedback">Grade must be between 0 and 100.</div>');
             }
@@ -1282,35 +1460,58 @@ jQuery(document).ready(function () {
     }
 
     function calculateFinalGrade() {
-        let q1 = parseFloat($("#new_grade_quarter_1").val());
-        let q2 = parseFloat($("#new_grade_quarter_2").val());
-        let q3 = parseFloat($("#new_grade_quarter_3").val());
-        let q4 = parseFloat($("#new_grade_quarter_4").val());
+        const semester = $("input[name='new_grade_semester']:checked").val();
 
-        // Validate all fields
-        let allValid = true;
-        $("#new_grade_quarter_1, #new_grade_quarter_2, #new_grade_quarter_3, #new_grade_quarter_4").each(function () {
-            if (!validateField($(this))) {
-                allValid = false;
-            }
-        });
-
-        if (!allValid) {
-            $("#new_grade_final").val("");
-            $("#new_grade_remarks").val("");
+        let quarters = [];
+        if (semester === "1") {
+            quarters = [
+                $("#new_grade_quarter_1"),
+                $("#new_grade_quarter_2"),
+            ];
+        } else if (semester === "2") {
+            quarters = [
+                $("#new_grade_quarter_3"),
+                $("#new_grade_quarter_4"),
+            ];
+        } else {
+            clearFinalGrade();
             return;
         }
 
-        // Only calculate if all values are filled and valid
-        if (!isNaN(q1) && !isNaN(q2) && !isNaN(q3) && !isNaN(q4)) {
-            let finalGrade = (q1 + q2 + q3 + q4) / 4;
-            $("#new_grade_final").val(finalGrade.toFixed(2));
-
-            $("#new_grade_remarks").val(finalGrade >= 75 ? "PASSED" : "FAILED");
-        } else {
-            $("#new_grade_final").val("");
-            $("#new_grade_remarks").val("");
+        // Validate only non-empty inputs
+        for (const $q of quarters) {
+            const val = $q.val().trim();
+            if (val !== "" && !validateGradeInput($q)) {
+                clearFinalGrade();
+                return;
+            }
         }
+
+        // Check if both inputs have values (no empty)
+        if (quarters.some($q => $q.val().trim() === "")) {
+            clearFinalGrade();
+            return;
+        }
+
+        // Both quarters have input and valid, calculate average
+        const quarterVals = quarters.map($q => parseFloat($q.val()));
+
+        const avg = quarterVals.reduce((a, b) => a + b, 0) / quarterVals.length;
+
+        $("#new_grade_final").val(avg.toFixed(2)).attr("placeholder", "");
+        $("#new_grade_remarks").val(avg >= 75 ? "PASSED" : "FAILED").attr("placeholder", "");
+    }
+
+    function clearFinalGrade() {
+        $("#new_grade_final").val("").attr("placeholder", "Not Yet Available");
+        $("#new_grade_remarks").val("").attr("placeholder", "Not Yet Available");
+    }
+
+    function enable_first_semester() {
+        $("#first_semester_grades").show();
+        $("#second_semester_grades").hide();
+        $("#new_grade_quarter_1, #new_grade_quarter_2").prop("disabled", false);
+        $("#new_grade_quarter_3, #new_grade_quarter_4").prop("disabled", true).val("");
     }
 
     function is_form_loading(modal_id, is_loading) {
@@ -1413,9 +1614,9 @@ $(function () {
             tbody.append(
                 $('<tr>')
                     .append($('<td>').addClass('text-start').text(subject))
-                    .append($('<td>').text('—'))
-                    .append($('<td>').text('—'))
-                    .append($('<td>').text('—')) // Semester grade blank as em dash
+                    .append($('<td>').addClass('text-center').text('—')) // centered
+                    .append($('<td>').addClass('text-center').text('—')) // centered
+                    .append($('<td>').addClass('text-center').text('—')) // centered Semester grade
             );
         });
         tbody.append(createSectionHeader('Applied and Specialized Subjects'));
@@ -1423,16 +1624,16 @@ $(function () {
             tbody.append(
                 $('<tr>')
                     .append($('<td>').addClass('text-start').text(subject))
-                    .append($('<td>').text('—'))
-                    .append($('<td>').text('—'))
-                    .append($('<td>').text('—')) // Semester grade blank as em dash
+                    .append($('<td>').addClass('text-center').text('—')) // centered
+                    .append($('<td>').addClass('text-center').text('—')) // centered
+                    .append($('<td>').addClass('text-center').text('—')) // centered Semester grade
             );
         });
         // General Average Row
         tbody.append(
             $('<tr>')
                 .append($('<td>').attr('colspan', 3).addClass('text-end fw-semibold').text('General Average for the Semester'))
-                .append($('<td>').text('—'))
+                .append($('<td>').addClass('text-center').text('—')) // centered
         );
     }
 
@@ -1477,9 +1678,9 @@ $(function () {
                         parsedGradesTbody.append(
                             $('<tr>')
                                 .append($('<td>').addClass('text-start').text(subject))
-                                .append($('<td>').text(grades[0] !== undefined ? grades[0] : '—'))
-                                .append($('<td>').text(grades[1] !== undefined ? grades[1] : '—'))
-                                .append($('<td>').text(semGrade))
+                                .append($('<td>').addClass('text-center').text(grades[0] !== undefined ? grades[0] : '—')) // centered
+                                .append($('<td>').addClass('text-center').text(grades[1] !== undefined ? grades[1] : '—')) // centered
+                                .append($('<td>').addClass('text-center').text(semGrade)) // centered
                         );
                     });
                     parsedGradesTbody.append(createSectionHeader('Applied and Specialized Subjects'));
@@ -1493,9 +1694,9 @@ $(function () {
                         parsedGradesTbody.append(
                             $('<tr>')
                                 .append($('<td>').addClass('text-start').text(subject))
-                                .append($('<td>').text(grades[0] !== undefined ? grades[0] : '—'))
-                                .append($('<td>').text(grades[1] !== undefined ? grades[1] : '—'))
-                                .append($('<td>').text(semGrade))
+                                .append($('<td>').addClass('text-center').text(grades[0] !== undefined ? grades[0] : '—')) // centered
+                                .append($('<td>').addClass('text-center').text(grades[1] !== undefined ? grades[1] : '—')) // centered
+                                .append($('<td>').addClass('text-center').text(semGrade)) // centered
                         );
                     });
                     // General Average Row
@@ -1503,7 +1704,7 @@ $(function () {
                     parsedGradesTbody.append(
                         $('<tr>')
                             .append($('<td>').attr('colspan', 3).addClass('text-end fw-semibold').text('General Average for the Semester'))
-                            .append($('<td>').text(genAvg))
+                            .append($('<td>').addClass('text-center').text(genAvg)) // centered
                     );
                 } else {
                     alert('Error: ' + (data.error || 'Unknown error occurred.'));

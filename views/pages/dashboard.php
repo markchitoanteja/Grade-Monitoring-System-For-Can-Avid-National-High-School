@@ -98,7 +98,7 @@ $logs = $db->run_custom_query("SELECT l.*, u.name AS username FROM logs l JOIN u
     </div>
 
     <!-- Dashboard Summary Cards -->
-    <section class="section ">
+    <section class="section">
         <!-- Cards -->
         <div class="row g-4">
             <!-- Number of Strands -->
@@ -159,11 +159,17 @@ $logs = $db->run_custom_query("SELECT l.*, u.name AS username FROM logs l JOIN u
         </div>
 
         <!-- Logs Section -->
-        <div class="row mt-5">
+        <div class="row mt-4">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="bi bi-clock-history me-1"></i> Recent Activity Logs</h5>
+                        <h5 class="card-title">
+                            <i class="bi bi-clock-history me-1"></i> Recent Activity Logs
+                            <!-- Add Clear Logs Button -->
+                            <button class="btn btn-danger btn-sm float-end" id="clear_logs_btn">
+                                <i class="bi bi-trash"></i> Clear Logs
+                            </button>
+                        </h5>
 
                         <table class="table datatable">
                             <thead>
