@@ -4,6 +4,10 @@ $(document).ready(function () {
 
     enable_first_semester();
 
+    if (current_page === "students") {
+        student_page_js();
+    }
+
     if (notification) {
         Swal.fire({
             title: notification.title,
@@ -34,56 +38,6 @@ $(document).ready(function () {
             }
         });
     })
-
-    const $cards = $(".strand-card");
-    const $rows = $("#studentsTable tbody tr");
-
-    // Disable cards with no students (except "all")
-    $cards.each(function () {
-        const strandId = $(this).data("strand");
-        if (strandId !== "all") {
-            const hasStudents = $rows.filter(`[data-strand='${strandId}']`).length > 0;
-            if (!hasStudents) {
-                $(this).addClass("disabled").css({
-                    "pointer-events": "none",
-                    "opacity": "0.5"
-                });
-            }
-        }
-    });
-
-    // Click event for strand filter cards
-    $cards.on("click", function () {
-        if ($(this).hasClass("disabled")) return; // skip disabled cards
-
-        const strandId = $(this).data("strand");
-
-        // Reset active state
-        $cards.removeClass("active");
-        $(this).addClass("active");
-
-        // Filter rows
-        $rows.each(function () {
-            const $row = $(this);
-            if (strandId === "all" || $row.data("strand") == strandId) {
-                $row.show();
-            } else {
-                $row.hide();
-            }
-        });
-    });
-
-    // Carousel control visibility
-    const $prevBtn = $(".carousel-control-prev");
-    const $nextBtn = $(".carousel-control-next");
-
-    if ($cards.length > 4) {
-        $prevBtn.show();
-        $nextBtn.show();
-    } else {
-        $prevBtn.hide();
-        $nextBtn.hide();
-    }
 
     $("#account_settings").click(function () {
         $("#account_settings_modal").modal("show");
@@ -1434,6 +1388,51 @@ $(document).ready(function () {
             }
         });
     })
+
+    function student_page_js() {
+        const $cards = $(".strand-card");
+
+        // Init DataTable (only once for #studentsTable)
+        const dataTable = new simpleDatatables.DataTable("#studentsTable", {
+            sortable: false,
+            perPage: 5,
+            paging: true
+        });
+
+        // Click event for strand filter cards
+        $cards.on("click", function () {
+            const $this = $(this);
+            if ($this.hasClass("disabled")) return; // skip disabled
+
+            const strandId = $this.data("strand");
+
+            // Reset active state
+            $cards.removeClass("active");
+            $this.addClass("active");
+
+            if (strandId === "all") {
+                // Reset filter
+                dataTable.search("");
+            } else {
+                // Find the Strand code text from the clicked card
+                const strandCode = $this.find(".strand-code").text().trim();
+                // Search the Strand column (3rd column in table)
+                dataTable.search(strandCode);
+            }
+        });
+
+        // Carousel control visibility
+        const $prevBtn = $(".carousel-control-prev");
+        const $nextBtn = $(".carousel-control-next");
+
+        if ($cards.length > 4) {
+            $prevBtn.show();
+            $nextBtn.show();
+        } else {
+            $prevBtn.hide();
+            $nextBtn.hide();
+        }
+    }
 
     function calculateUpdateFinalGrade() {
         const semester = $("input[name='update_grade_semester']:checked").val();

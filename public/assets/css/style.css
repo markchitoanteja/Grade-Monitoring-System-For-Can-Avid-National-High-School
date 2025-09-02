@@ -1308,7 +1308,48 @@ h6 {
   box-shadow: none;
 }
 
+/* Align controls relative to cards */
+#strandCarousel {
+  position: relative;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  top: 50%;
+  /* center vertically */
+  transform: translateY(-50%);
+  height: auto;
+  /* don’t stretch full height */
+  width: 40px;
+  /* keep button slim */
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}
+
+/* Smaller icons */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-  filter: invert(1);
+  width: 1.5rem;
+  height: 1.5rem;
+  background-size: 70% 70%;
+  filter: invert(1) grayscale(100%);
+}
+
+/* Optional subtle circle background */
+.carousel-control-prev-icon::before,
+.carousel-control-next-icon::before {
+  content: '';
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

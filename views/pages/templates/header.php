@@ -23,7 +23,7 @@ $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
     <link href="<?= base_url('public/assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
     <link href="<?= base_url('public/assets/vendor/simple-datatables/style.css') ?>" rel="stylesheet">
     <link href="<?= base_url('public/assets/vendor/sweetalert2/css/sweetalert2.min.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('public/assets/css/style.css?v=1.1') ?>" rel="stylesheet">
+    <link href="<?= base_url('public/assets/css/style.css?v=1.3') ?>" rel="stylesheet">
 </head>
 
 <body>
