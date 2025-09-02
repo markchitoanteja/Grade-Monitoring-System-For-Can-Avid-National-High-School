@@ -99,49 +99,53 @@ $strands = $db->select_all("strands", "name", "ASC");
             </button>
         </div>
 
-            <!-- Students Table -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="bi bi-journal-bookmark me-1"></i> Students</h5>
+        <!-- Students Table -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-journal-bookmark me-1"></i> Students</h5>
 
-                            <table class="table" id="studentsTable">
-                                <thead>
+                        <table class="table" id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Learner Reference Number</th>
+                                    <th>Full Name</th>
+                                    <th>Strand</th>
+                                    <th>Grade Level & Section</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if ($students = $db->select_all("students", "id", "DESC")): ?>
+                                    <?php foreach ($students as $student): ?>
+                                        <?php $strand = $db->select_one("strands", "id", $student["strand_id"]); ?>
+                                        <tr data-strand="<?= $strand["id"] ?>">
+                                            <td><?= $student["lrn"] ?></td>
+                                            <td>
+                                                <?= $student["first_name"] . ' ' .
+                                                    (!empty($student["middle_name"]) ? substr($student["middle_name"], 0, 1) . '. ' : '') .
+                                                    $student["last_name"] ?>
+                                            </td>
+                                            <td><?= $strand["code"] ?></td>
+                                            <td><?= $student["grade_level"] . "-" . $student["section"] ?></td>
+                                            <td class="text-center">
+                                                <i class="bi bi-pencil-fill text-primary me-1 update_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
+                                                <i class="bi bi-trash-fill text-danger delete_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                <?php else: ?>
                                     <tr>
-                                        <th>Learner Reference Number</th>
-                                        <th>Full Name</th>
-                                        <th>Strand</th>
-                                        <th>Grade Level & Section</th>
-                                        <th class="text-center">Actions</th>
+                                        <td colspan="5" class="text-center">No students found.</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if ($students = $db->select_all("students", "id", "DESC")): ?>
-                                        <?php foreach ($students as $student): ?>
-                                            <?php $strand = $db->select_one("strands", "id", $student["strand_id"]); ?>
-                                            <tr data-strand="<?= $strand["id"] ?>">
-                                                <td><?= $student["lrn"] ?></td>
-                                                <td>
-                                                    <?= $student["first_name"] . ' ' .
-                                                        (!empty($student["middle_name"]) ? substr($student["middle_name"], 0, 1) . '. ' : '') .
-                                                        $student["last_name"] ?>
-                                                </td>
-                                                <td><?= $strand["code"] ?></td>
-                                                <td><?= $student["grade_level"] . "-" . $student["section"] ?></td>
-                                                <td class="text-center">
-                                                    <i class="bi bi-pencil-fill text-primary me-1 update_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
-                                                    <i class="bi bi-trash-fill text-danger delete_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach ?>
-                                    <?php endif ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                <?php endif ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 </main>
 
