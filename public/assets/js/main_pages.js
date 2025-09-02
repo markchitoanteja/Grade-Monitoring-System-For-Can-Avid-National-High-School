@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    preventDevTools(true);
+    preventDevTools(false);
     preventMobileAccess(true);
 
     enable_first_semester();
@@ -34,6 +34,56 @@ $(document).ready(function () {
             }
         });
     })
+
+    const $cards = $(".strand-card");
+    const $rows = $("#studentsTable tbody tr");
+
+    // Disable cards with no students (except "all")
+    $cards.each(function () {
+        const strandId = $(this).data("strand");
+        if (strandId !== "all") {
+            const hasStudents = $rows.filter(`[data-strand='${strandId}']`).length > 0;
+            if (!hasStudents) {
+                $(this).addClass("disabled").css({
+                    "pointer-events": "none",
+                    "opacity": "0.5"
+                });
+            }
+        }
+    });
+
+    // Click event for strand filter cards
+    $cards.on("click", function () {
+        if ($(this).hasClass("disabled")) return; // skip disabled cards
+
+        const strandId = $(this).data("strand");
+
+        // Reset active state
+        $cards.removeClass("active");
+        $(this).addClass("active");
+
+        // Filter rows
+        $rows.each(function () {
+            const $row = $(this);
+            if (strandId === "all" || $row.data("strand") == strandId) {
+                $row.show();
+            } else {
+                $row.hide();
+            }
+        });
+    });
+
+    // Carousel control visibility
+    const $prevBtn = $(".carousel-control-prev");
+    const $nextBtn = $(".carousel-control-next");
+
+    if ($cards.length > 4) {
+        $prevBtn.show();
+        $nextBtn.show();
+    } else {
+        $prevBtn.hide();
+        $nextBtn.hide();
+    }
 
     $("#account_settings").click(function () {
         $("#account_settings_modal").modal("show");

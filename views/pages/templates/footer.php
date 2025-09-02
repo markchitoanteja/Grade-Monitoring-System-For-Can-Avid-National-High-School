@@ -21,8 +21,8 @@
         <script src="<?= base_url("public/assets/vendor/simple-datatables/simple-datatables.js") ?>"></script>
         <script src="<?= base_url("public/assets/vendor/jquery/jquery.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/vendor/sweetalert2/js/sweetalert2.min.js") ?>"></script>
-        <script src="<?= base_url("public/assets/js/main.js?v=1.0.1") ?>"></script>
-        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.2.6") ?>"></script>
+        <script src="<?= base_url("public/assets/js/main.js?v=1.0.8") ?>"></script>
+        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.2.9") ?>"></script>
     </body>
 </html>
 

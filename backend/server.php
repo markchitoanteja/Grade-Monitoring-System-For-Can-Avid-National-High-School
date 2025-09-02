@@ -112,14 +112,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
+            $mail->Host       = 'smtp.hostinger.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'cnhs.official2025@gmail.com';
-            $mail->Password   = 'wzyqcaauzngvdxyb';
+            $mail->Username   = 'support@essuc.online';
+            $mail->Password   = '09465287111@Mark';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port       = 465;
 
-            $mail->setFrom('cnhs.official2025@gmail.com', 'Can-Avid National High School');
+            $mail->setFrom('support@essuc.online', 'Can-Avid National High School');
             $mail->addAddress($receiver_email, $receiver_name);
 
             $mail->isHTML(true);

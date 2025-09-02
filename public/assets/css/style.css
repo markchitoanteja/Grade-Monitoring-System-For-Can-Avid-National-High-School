@@ -22,7 +22,8 @@ body {
   flex-direction: column;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   display: flex;
@@ -1235,7 +1236,8 @@ h6 {
   font-size: 14px;
   transition: all 0.3s;
   border-top: 1px solid #cddfff;
-  margin-top: auto; /* KEY: pushes footer to bottom */
+  margin-top: auto;
+  /* KEY: pushes footer to bottom */
 }
 
 .footer .copyright {
@@ -1248,4 +1250,65 @@ h6 {
   text-align: center;
   font-size: 13px;
   color: #012970;
+}
+
+.strand-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  height: 160px;
+  /* taller to fit code + name */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.strand-card .card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 12px;
+}
+
+.strand-card .strand-code {
+  font-size: 1rem;
+  color: #0d6efd;
+}
+
+.strand-card .strand-name {
+  font-size: 0.85rem;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.strand-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.strand-card.active {
+  border-color: #0d6efd;
+  background: #e7f1ff;
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.2);
+}
+
+.strand-card.disabled {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(1);
 }
