@@ -35,9 +35,9 @@ if (!isset($_SESSION["user_id"])) {
             </div>
             <div class="col-6">
                 <div class="d-flex gap-2 justify-content-end">
-                    <button class="btn btn-success" id="ocr_upload_btn">
+                    <!-- <button class="btn btn-success" id="ocr_upload_btn">
                         <i class="bi bi-camera me-1"></i> OCR Upload
-                    </button>
+                    </button> -->
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new_grade_modal">
                         <i class="bi bi-plus"></i> New Grade
                     </button>
@@ -60,7 +60,6 @@ if (!isset($_SESSION["user_id"])) {
                                 <tr>
                                     <th>Student Name</th>
                                     <th>Subject</th>
-                                    <th>Average Grade</th>
                                     <th>Semester</th>
                                     <th>Final Grade</th>
                                     <th>Remarks</th>
@@ -137,7 +136,6 @@ if (!isset($_SESSION["user_id"])) {
                                         <tr>
                                             <td><?= htmlspecialchars($grade["student_name"]) ?></td>
                                             <td><?= htmlspecialchars($grade["subject_name"]) ?></td>
-                                            <td><?= $average_display ?></td>
                                             <td><?= htmlspecialchars($semester) ?></td>
                                             <td><?= $final_grade_display ?></td>
                                             <td><?= $remarks_display ?></td>
