@@ -104,58 +104,66 @@ $logs = $db->run_custom_query("SELECT l.*, u.name AS username FROM logs l JOIN u
         <div class="row g-4">
             <!-- Number of Strands -->
             <div class="col-lg-3 col-md-6">
-                <div class="card stat-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-circle icon-info">
-                            <i class="bi bi-diagram-3-fill fs-3"></i>
+                <a href="strands" class="text-decoration-none text-dark">
+                    <div class="card stat-card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle icon-info">
+                                <i class="bi bi-diagram-3-fill fs-3"></i>
+                            </div>
+                            <div class="stat-title">Number of Strands</div>
+                            <div class="stat-value"><?= $total_strands ?></div>
+                            <div class="stat-sub">Available SHS strands</div>
                         </div>
-                        <div class="stat-title">Number of Strands</div>
-                        <div class="stat-value"><?= $total_strands ?></div>
-                        <div class="stat-sub">Available SHS strands</div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Total Students -->
             <div class="col-lg-3 col-md-6">
-                <div class="card stat-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-circle icon-primary">
-                            <i class="bi bi-people-fill fs-3"></i>
+                <a href="students" class="text-decoration-none text-dark">
+                    <div class="card stat-card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle icon-primary">
+                                <i class="bi bi-people-fill fs-3"></i>
+                            </div>
+                            <div class="stat-title">Total Students</div>
+                            <div class="stat-value"><?= $total_students ?></div>
+                            <div class="stat-sub">Enrolled SHS students</div>
                         </div>
-                        <div class="stat-title">Total Students</div>
-                        <div class="stat-value"><?= $total_students ?></div>
-                        <div class="stat-sub">Enrolled SHS students</div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Total Subjects -->
             <div class="col-lg-3 col-md-6">
-                <div class="card stat-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-circle icon-warning">
-                            <i class="bi bi-book-fill fs-3"></i>
+                <a href="subjects" class="text-decoration-none text-dark">
+                    <div class="card stat-card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle icon-warning">
+                                <i class="bi bi-book-fill fs-3"></i>
+                            </div>
+                            <div class="stat-title">Total Subjects</div>
+                            <div class="stat-value"><?= $total_subjects ?></div>
+                            <div class="stat-sub">Available SHS subjects</div>
                         </div>
-                        <div class="stat-title">Total Subjects</div>
-                        <div class="stat-value"><?= $total_subjects ?></div>
-                        <div class="stat-sub">Available SHS subjects</div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Grades Recorded -->
             <div class="col-lg-3 col-md-6">
-                <div class="card stat-card shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-circle icon-success">
-                            <i class="bi bi-journal-text fs-3"></i>
+                <a href="grades" class="text-decoration-none text-dark">
+                    <div class="card stat-card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="icon-circle icon-success">
+                                <i class="bi bi-journal-text fs-3"></i>
+                            </div>
+                            <div class="stat-title">Grades Recorded</div>
+                            <div class="stat-value"><?= $total_grades ?></div>
+                            <div class="stat-sub">Submitted grade entries</div>
                         </div>
-                        <div class="stat-title">Grades Recorded</div>
-                        <div class="stat-value"><?= $total_grades ?></div>
-                        <div class="stat-sub">Submitted grade entries</div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 

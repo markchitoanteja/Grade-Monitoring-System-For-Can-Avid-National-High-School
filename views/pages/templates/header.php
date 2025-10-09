@@ -29,9 +29,9 @@ $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
-            <a href="index.html" class="logo d-flex align-items-center">
+            <a href="<?= base_url() ?>" class="logo d-flex align-items-center">
                 <img src="<?= base_url('public/assets/img/logo.png') ?>" alt="">
-                <span class="d-none d-lg-block">Grading System</span>
+                <span class="d-none d-lg-block">CNHS Portal</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
@@ -129,6 +129,14 @@ $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
                 <a class="nav-link <?= $current_page != "grades" ? "collapsed" : null ?>" href="grades">
                     <i class="bi bi-bar-chart"></i>
                     <span>Grades</span>
+                </a>
+            </li>
+
+            <!-- Reports -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "reports" ? "collapsed" : null ?>" href="reports">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Reports</span>
                 </a>
             </li>
 

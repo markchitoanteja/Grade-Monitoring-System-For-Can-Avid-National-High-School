@@ -41,7 +41,7 @@ if (isset($_SESSION["user_id"])) {
                     <div class="row">
                         <!-- Login Form -->
                         <div class="col-7">
-                            <h4 class="mb-3">Administrator Login</h4>
+                            <h4 class="mb-3">Welcome to CNHS!</h4>
 
                             <form action="javascript:void(0)" id="login_form">
                                 <div class="form-group mb-3">

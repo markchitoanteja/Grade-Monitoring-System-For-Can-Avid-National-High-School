@@ -1,0 +1,2 @@
+[2025-10-10 00:14:29] Exception: Column 'user_id' cannot be null
+[2025-10-10 00:14:32] Exception: Column 'user_id' cannot be null

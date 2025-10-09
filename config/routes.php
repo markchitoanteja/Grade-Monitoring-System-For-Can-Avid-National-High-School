@@ -10,7 +10,12 @@ $routes = [
     'students'              => 'views/pages/students.php',
     'subjects'              => 'views/pages/subjects.php',
     'grades'                => 'views/pages/grades.php',
+    'reports'                => 'views/pages/reports.php',
     'backup_and_restore'    => 'views/pages/backup_and_restore.php',
+
+    // Print and Export
+    'export_report'         => 'views/pages/export_report.php',
+    'print_report'          => 'views/pages/print_report.php',
 
     // Student Pages
     'student'               => 'views/student/login.php',

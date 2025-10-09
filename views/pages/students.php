@@ -45,85 +45,89 @@ $strands = $db->select_all("strands", "name", "ASC");
 
     <section class="section">
         <?php
-        // ✅ Preload student counts by strand (efficient: one query)
         $studentCounts = [];
         $results = $db->run_custom_query("
-    SELECT strand_id, COUNT(*) as total
-    FROM students
-    GROUP BY strand_id
-");
+            SELECT strand_id, COUNT(*) as total
+            FROM students
+            GROUP BY strand_id
+        ");
+
+        $totalStudents = 0;
 
         if ($results) {
             foreach ($results as $row) {
                 $studentCounts[$row['strand_id']] = (int)$row['total'];
+                $totalStudents += (int)$row['total'];
             }
         }
         ?>
 
-        <!-- Strand Filter Cards -->
-        <div id="strandCarousel" class="carousel slide" data-bs-interval="false">
-            <div class="carousel-inner">
+        <?php if ($totalStudents > 0): ?>
+            <!-- Strand Filter Cards -->
+            <div id="strandCarousel" class="carousel slide" data-bs-interval="false">
+                <div class="carousel-inner">
+                    <!-- First item (All Students + first 3 strands) -->
+                    <div class="carousel-item active">
+                        <div class="row justify-content-center">
+                            <!-- All Students Card -->
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card strand-card text-center active" data-strand="all">
+                                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                                        <i class="bi bi-people fs-2 text-primary"></i>
+                                        <h6 class="card-title mt-2 mb-0">All Students</h6>
+                                    </div>
+                                </div>
+                            </div>
 
-                <!-- First item (All Students + first 3 strands) -->
-                <div class="carousel-item active">
-                    <div class="row justify-content-center">
-                        <!-- All Students Card -->
+                            <?php if ($strands): ?>
+                                <?php $count = 0; ?>
+                                <?php foreach ($strands as $strand): ?>
+                                    <?php if ($count > 0 && $count % 3 === 0): ?>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row justify-content-center">
+                        <?php endif; ?>
+
+                        <?php
+                                    $strandId = $strand['id'];
+                                    $studentCount = $studentCounts[$strandId] ?? 0;
+                                    $isDisabled = $studentCount === 0;
+                        ?>
+
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <div class="card strand-card text-center active" data-strand="all">
+                            <div class="card strand-card text-center <?= $isDisabled ? 'disabled' : '' ?>"
+                                data-strand="<?= $strandId ?>"
+                                style="<?= $isDisabled ? 'pointer-events:none;opacity:0.5;' : '' ?>">
                                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                                    <i class="bi bi-people fs-2 text-primary"></i>
-                                    <h6 class="card-title mt-2 mb-0">All Students</h6>
+                                    <i class="bi bi-journal-bookmark fs-2 text-success mb-2"></i>
+                                    <h6 class="strand-code fw-bold mb-1"><?= htmlspecialchars($strand["code"]) ?></h6>
+                                    <p class="strand-name small text-muted mb-0 text-truncate" style="max-width:95%;">
+                                        <?= htmlspecialchars($strand["name"]) ?>
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <?php if ($strands): ?>
-                            <?php $count = 0; ?>
-                            <?php foreach ($strands as $strand): ?>
-                                <?php if ($count > 0 && $count % 3 === 0): ?>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="row justify-content-center">
-                    <?php endif; ?>
-
-                    <?php
-                                $strandId = $strand['id'];
-                                $studentCount = $studentCounts[$strandId] ?? 0;
-                                $isDisabled = $studentCount === 0;
-                    ?>
-
-                    <div class="col-md-3 col-sm-6 mb-3">
-                        <div class="card strand-card text-center <?= $isDisabled ? 'disabled' : '' ?>"
-                            data-strand="<?= $strandId ?>"
-                            style="<?= $isDisabled ? 'pointer-events:none;opacity:0.5;' : '' ?>">
-                            <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                                <i class="bi bi-journal-bookmark fs-2 text-success mb-2"></i>
-                                <h6 class="strand-code fw-bold mb-1"><?= htmlspecialchars($strand["code"]) ?></h6>
-                                <p class="strand-name small text-muted mb-0 text-truncate" style="max-width:95%;">
-                                    <?= htmlspecialchars($strand["name"]) ?>
-                                </p>
-                            </div>
+                        <?php $count++; ?>
+                    <?php endforeach ?>
+                <?php endif; ?>
                         </div>
                     </div>
-
-                    <?php $count++; ?>
-                <?php endforeach ?>
-            <?php endif; ?>
-                    </div>
                 </div>
+
+                <!-- Carousel controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#strandCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#strandCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
             </div>
 
-            <!-- Carousel controls -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#strandCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#strandCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
+        <?php endif; ?>
 
         <!-- Students Table -->
         <div class="row">

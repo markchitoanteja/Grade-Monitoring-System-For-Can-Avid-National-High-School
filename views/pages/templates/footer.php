@@ -3,7 +3,7 @@
 
         <footer id="footer" class="footer">
             <div class="copyright">
-                &copy; Copyright <strong><span>Students Grading System</span></strong>. All Rights Reserved.
+                &copy; Copyright <strong><span>Grade Monitoring System</span></strong>. All Rights Reserved.
             </div>
         </footer>
 
@@ -14,6 +14,8 @@
             const user_id = "<?= $_SESSION["user_id"] ?>";
             const notification = <?= isset($_SESSION["notification"]) ? json_encode($_SESSION["notification"]) : json_encode(null) ?>;
             const current_page = "<?= $current_page ?>";
+            const exportUrl = '<?= base_url() ?>export_report';
+            const printUrl = '<?= base_url() ?>print_report';
         </script>
 
         <script src="<?= base_url("public/assets/vendor/chart.js/chart.umd.js") ?>"></script>
@@ -22,8 +24,9 @@
         <script src="<?= base_url("public/assets/vendor/jquery/jquery.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/vendor/sweetalert2/js/sweetalert2.min.js") ?>"></script>
         <script src="<?= base_url("public/assets/js/main.js?v=1.0.8") ?>"></script>
-        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.3.4") ?>"></script>
-    </body>
-</html>
+        <script src="<?= base_url("public/assets/js/main_pages.js?v=1.3.5") ?>"></script>
+        </body>
 
-<?php unset($_SESSION["notification"]) ?>
+        </html>
+
+        <?php unset($_SESSION["notification"]) ?>

@@ -1389,6 +1389,28 @@ $(document).ready(function () {
         });
     })
 
+    // Export all
+    $('#export_reports_btn').on('click', function () {
+        window.location.href = exportUrl;
+    });
+
+    // Print all
+    $('#print_reports_btn').on('click', function () {
+        window.open(printUrl, '_blank');
+    });
+
+    // Export specific year
+    $('.export-year-btn').on('click', function () {
+        var year = $(this).data('year');
+        window.location.href = exportUrl + '?year=' + year;
+    });
+
+    // Print specific year
+    $('.print-year-btn').on('click', function () {
+        var year = $(this).data('year');
+        window.open(printUrl + '?year=' + year, '_blank');
+    });
+
     function student_page_js() {
         const $cards = $(".strand-card");
 
