@@ -17,7 +17,6 @@ if (!isset($db)) {
 $year = isset($_GET['year']) && is_numeric($_GET['year']) ? intval($_GET['year']) : null;
 
 if ($year) {
-    // Fetch all grades for the selected year
     $grades = $db->run_custom_query("
         SELECT 
             CONCAT(students.first_name, ' ', students.last_name) AS student_name,
@@ -32,7 +31,6 @@ if ($year) {
     ");
     $title = "Grade Report — School Year {$year}";
 } else {
-    // Print all years summary
     $grades = $db->run_custom_query("
         SELECT 
             YEAR(created_at) AS year,
@@ -47,13 +45,12 @@ if ($year) {
 }
 ?>
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
     <title><?= htmlspecialchars($title) ?></title>
     <link href="<?= base_url() ?>public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="shortcut icon" href="<?= base_url('public/assets/img/logo.png') ?>" type="image/x-icon">
 
     <style>
@@ -67,8 +64,8 @@ if ($year) {
         .school-header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
+            border-bottom: 3px solid #004080;
+            padding-bottom: 15px;
         }
 
         .school-header img {
@@ -78,28 +75,36 @@ if ($year) {
 
         .school-header h2 {
             margin: 0;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
+            color: #004080;
         }
 
         .school-header h3 {
-            margin: 0;
+            margin: 2px 0;
             font-size: 16px;
-            font-weight: 500;
+            color: #333;
         }
 
         .school-header p {
-            margin: 0;
             font-size: 13px;
             color: #666;
         }
 
+        h4.report-title {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+            color: #004080;
+        }
+
         h3.sem-title {
-            background: #f8f9fa;
+            background: #e9f2ff;
             padding: 8px 10px;
-            border-left: 4px solid #0d6efd;
+            border-left: 4px solid #004080;
             margin-top: 30px;
             font-weight: 600;
+            color: #004080;
         }
 
         .table {
@@ -109,13 +114,36 @@ if ($year) {
         .table th {
             background-color: #f2f2f2;
             font-weight: 600;
+            color: #003366;
+            text-align: center;
+        }
+
+        .table td {
+            vertical-align: middle;
+            text-align: center;
         }
 
         footer {
-            margin-top: 40px;
+            margin-top: 60px;
             text-align: center;
             font-size: 12px;
             color: #555;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        .signature-section {
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .signature-line {
+            display: inline-block;
+            width: 200px;
+            margin: 20px 30px;
+            border-top: 1px solid #333;
+            font-size: 12px;
+            padding-top: 5px;
         }
 
         @media print {
@@ -128,7 +156,13 @@ if ($year) {
             }
 
             .table th {
-                background: #eee !important;
+                background: #e9f2ff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            h3.sem-title {
+                background: #e9f2ff !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -144,15 +178,16 @@ if ($year) {
             <h2>Can-Avid National High School</h2>
             <h3>Senior High School Department</h3>
             <?php if ($year): ?>
-                <p>School Year <?= htmlspecialchars($year) ?></p>
+                <p><strong>School Year:</strong> <?= htmlspecialchars($year) ?></p>
+            <?php else: ?>
+                <p><strong>All Yearly Summary Report</strong></p>
             <?php endif; ?>
         </div>
 
-        <h4 class="text-center mb-4"><?= htmlspecialchars($title) ?></h4>
+        <h4 class="report-title"><?= htmlspecialchars($title) ?></h4>
 
         <?php if ($year && !empty($grades)): ?>
             <?php
-            // Separate grades by semester based on quarters
             $first_sem = [];
             $second_sem = [];
 
@@ -165,15 +200,8 @@ if ($year) {
                 $has_first_sem = ($q1 > 0 || $q2 > 0);
                 $has_second_sem = ($q3 > 0 || $q4 > 0);
 
-                if ($has_first_sem && !$has_second_sem) {
-                    $first_sem[] = $g;
-                } elseif ($has_second_sem && !$has_first_sem) {
-                    $second_sem[] = $g;
-                } elseif ($has_first_sem && $has_second_sem) {
-                    // Rare case: include in both
-                    $first_sem[] = $g;
-                    $second_sem[] = $g;
-                }
+                if ($has_first_sem) $first_sem[] = $g;
+                if ($has_second_sem) $second_sem[] = $g;
             }
             ?>
 
@@ -185,10 +213,10 @@ if ($year) {
                         <tr>
                             <th>Student Name</th>
                             <th>Subject</th>
-                            <th class="text-center">Quarter 1</th>
-                            <th class="text-center">Quarter 2</th>
-                            <th class="text-center">Final Grade</th>
-                            <th class="text-center">Remarks</th>
+                            <th>Quarter 1</th>
+                            <th>Quarter 2</th>
+                            <th>Computed Final Grade</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -202,10 +230,10 @@ if ($year) {
                             <tr>
                                 <td><?= htmlspecialchars($g['student_name']) ?></td>
                                 <td><?= htmlspecialchars($g['subject_name']) ?></td>
-                                <td class="text-center"><?= $q1 ?: '—' ?></td>
-                                <td class="text-center"><?= $q2 ?: '—' ?></td>
-                                <td class="text-center"><?= $computed ?></td>
-                                <td class="text-center"><?= htmlspecialchars($g['remarks'] ?: '—') ?></td>
+                                <td><?= $q1 ?: '—' ?></td>
+                                <td><?= $q2 ?: '—' ?></td>
+                                <td><?= $computed ?></td>
+                                <td><?= htmlspecialchars($g['remarks'] ?: '—') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -222,10 +250,10 @@ if ($year) {
                         <tr>
                             <th>Student Name</th>
                             <th>Subject</th>
-                            <th class="texxt-center">Quarter 3</th>
-                            <th class="texxt-center">Quarter 4</th>
-                            <th class="texxt-center">Final Grade</th>
-                            <th class="texxt-center">Remarks</th>
+                            <th>Quarter 3</th>
+                            <th>Quarter 4</th>
+                            <th>Computed Final Grade</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -239,10 +267,10 @@ if ($year) {
                             <tr>
                                 <td><?= htmlspecialchars($g['student_name']) ?></td>
                                 <td><?= htmlspecialchars($g['subject_name']) ?></td>
-                                <td class="text-center"><?= $q3 ?: '—' ?></td>
-                                <td class="text-center"><?= $q4 ?: '—' ?></td>
-                                <td class="text-center"><?= $computed ?></td>
-                                <td class="text-center"><?= htmlspecialchars($g['remarks'] ?: '—') ?></td>
+                                <td><?= $q3 ?: '—' ?></td>
+                                <td><?= $q4 ?: '—' ?></td>
+                                <td><?= $computed ?></td>
+                                <td><?= htmlspecialchars($g['remarks'] ?: '—') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -251,9 +279,16 @@ if ($year) {
                 <p class="text-center text-muted">No records found for Second Semester.</p>
             <?php endif; ?>
 
+            <!-- 🔹 Signature Section -->
+            <div class="signature-section">
+                <div class="signature-line">Prepared by:</div>
+                <div class="signature-line">Checked by:</div>
+                <div class="signature-line">Approved by:</div>
+            </div>
+
         <?php elseif (!$year && !empty($grades)): ?>
-            <!-- 🔹 PRINT ALL SUMMARY -->
-            <h4 class="mt-3">Yearly Summary</h4>
+            <!-- 🔹 ALL YEAR SUMMARY -->
+            <h3 class="sem-title">All Yearly Summary</h3>
             <table class="table table-bordered text-center">
                 <thead>
                     <tr>
@@ -280,10 +315,10 @@ if ($year) {
     </div>
 
     <footer>
-        <p class="mt-4 mb-0">
+        <p>
             Printed by: <strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Administrator') ?></strong><br>
             Date Printed: <?= date('F d, Y h:i A') ?><br>
-            <em>Can-Avid National High School | Senior High School Department</em>
+            <em>Can-Avid National High School — Senior High School Department</em>
         </p>
     </footer>
 </body>
