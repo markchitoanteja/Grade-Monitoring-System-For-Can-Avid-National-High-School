@@ -51,6 +51,7 @@ foreach ($grades as &$g) {
     $mInitial = $mname ? strtoupper(substr($mname, 0, 1)) . '.' : '';
     $g['student_name'] = "{$lname}, {$fname} {$mInitial}";
 }
+unset($g); // 🔥 FIX: break the reference to prevent duplicate student display
 
 // 🧩 Determine the title text
 $title_parts = [];

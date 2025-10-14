@@ -55,6 +55,7 @@ foreach ($grades as &$g) {
     $mInitial = $mname ? strtoupper(substr($mname, 0, 1)) . '.' : '';
     $g['student_name'] = "{$lname}, {$fname} {$mInitial}";
 }
+unset($g); // 🔥 FIX: break reference to prevent duplicated student rows
 
 // 🔹 Title
 $title_parts = [];
@@ -92,7 +93,7 @@ ob_start();
             background-color: #fff;
         }
 
-        /* === HEADER (Unified design with .school-header style) === */
+        /* === HEADER === */
         header.school-header {
             position: fixed;
             top: -120px;
@@ -195,7 +196,7 @@ ob_start();
             background-color: #fafafa;
         }
 
-        /* === SIGNATURES & MISC === */
+        /* === SIGNATURES === */
         .signature-section {
             margin-top: 80px;
             text-align: center;
@@ -230,6 +231,7 @@ ob_start();
     <main>
         <?php if (!empty($grades)): ?>
             <?php
+            // 🔹 Group by Strand → Subject
             $grouped = [];
             foreach ($grades as $g) {
                 $grouped[$g['strand_name']][$g['subject_name']][] = $g;
@@ -239,6 +241,7 @@ ob_start();
             ?>
                 <?php foreach ($subjects as $subject_name => $records): ?>
                     <?php
+                    // 🔹 Detect which quarters have grades
                     $visibleQuarters = [];
                     foreach (['quarter_1', 'quarter_2', 'quarter_3', 'quarter_4'] as $q) {
                         foreach ($records as $r) {
