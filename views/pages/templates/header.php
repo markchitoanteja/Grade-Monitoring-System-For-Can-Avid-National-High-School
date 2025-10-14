@@ -30,8 +30,11 @@ $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
             <a href="<?= base_url() ?>" class="logo d-flex align-items-center">
-                <img src="<?= base_url('public/assets/img/logo.png') ?>" alt="">
-                <span class="d-none d-lg-block">CNHS Portal</span>
+                <img src="<?= base_url('public/assets/img/logo.png') ?>" alt="Logo" style="height:40px;">
+                <div class="ms-2 d-flex flex-column">
+                    <span class="fw-bold" style="margin-bottom: 0.2rem;">Grade Monitoring</span>
+                    <span class="d-none d-lg-block" style="font-size: 0.8rem;">Can-Avid National High School</span>
+                </div>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
@@ -108,19 +111,19 @@ $user_data = $db->select_one("users", "id", $_SESSION["user_id"]);
                 </a>
             </li>
 
-            <!-- Students -->
-            <li class="nav-item">
-                <a class="nav-link <?= $current_page != "students" ? "collapsed" : null ?>" href="students">
-                    <i class="bi bi-people"></i>
-                    <span>Students</span>
-                </a>
-            </li>
-
             <!-- Subjects -->
             <li class="nav-item">
                 <a class="nav-link <?= $current_page != "subjects" ? "collapsed" : null ?>" href="subjects">
                     <i class="bi bi-book"></i>
                     <span>Subjects</span>
+                </a>
+            </li>
+
+            <!-- Students -->
+            <li class="nav-item">
+                <a class="nav-link <?= $current_page != "students" ? "collapsed" : null ?>" href="students">
+                    <i class="bi bi-people"></i>
+                    <span>Students</span>
                 </a>
             </li>
 

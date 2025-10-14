@@ -153,12 +153,22 @@ $strands = $db->select_all("strands", "name", "ASC");
                                         <tr data-strand="<?= $strand["id"] ?>">
                                             <td><?= $student["lrn"] ?></td>
                                             <td>
-                                                <?= $student["first_name"] . ' ' .
-                                                    (!empty($student["middle_name"]) ? substr($student["middle_name"], 0, 1) . '. ' : '') .
-                                                    $student["last_name"] ?>
+                                                <?php
+                                                // Format full name
+                                                $first = ucwords(strtolower($student["first_name"]));
+                                                $middle = !empty($student["middle_name"]) ? strtoupper(substr(trim($student["middle_name"]), 0, 1)) . '.' : '';
+                                                $last = ucwords(strtolower($student["last_name"]));
+                                                echo trim("$first $middle $last");
+                                                ?>
                                             </td>
-                                            <td><?= $strand["code"] ?></td>
-                                            <td><?= $student["grade_level"] . "-" . $student["section"] ?></td>
+                                            <td><?= strtoupper($strand["code"]) ?></td>
+                                            <td>
+                                                <?php
+                                                $gradeLevel = "Grade " . ucfirst(strtolower($student["grade_level"]));
+                                                $section = ucwords(strtolower($student["section"]));
+                                                echo "$gradeLevel - $section";
+                                                ?>
+                                            </td>
                                             <td class="text-center">
                                                 <i class="bi bi-pencil-fill text-primary me-1 update_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>
                                                 <i class="bi bi-trash-fill text-danger delete_student_btn" role="button" data-account_id="<?= $student["account_id"] ?>"></i>

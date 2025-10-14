@@ -8,6 +8,10 @@ $(document).ready(function () {
         student_page_js();
     }
 
+    if (current_page === "subjects") {
+        subject_page_js();
+    }
+
     if (notification) {
         Swal.fire({
             title: notification.title,
@@ -1389,28 +1393,51 @@ $(document).ready(function () {
         });
     })
 
-    // Export all
-    $('#export_reports_btn').on('click', function () {
-        window.location.href = exportUrl;
-    });
+    function subject_page_js() {
+        const $cards = $(".strand-card");
 
-    // Print all
-    $('#print_reports_btn').on('click', function () {
-        window.open(printUrl, '_blank');
-    });
+        // Init DataTable (only once for #subjectsTable)
+        const dataTable = new simpleDatatables.DataTable("#subjectsTable", {
+            sortable: false,
+            perPage: 5,
+            paging: true
+        });
 
-    // Export specific year
-    $('.export-year-btn').on('click', function () {
-        var year = $(this).data('year');
-        window.location.href = exportUrl + '?year=' + year;
-    });
+        // Click event for strand filter cards
+        $cards.on("click", function () {
+            const $this = $(this);
+            if ($this.hasClass("disabled")) return; // skip disabled
 
-    // Print specific year
-    $('.print-year-btn').on('click', function () {
-        var year = $(this).data('year');
-        window.open(printUrl + '?year=' + year, '_blank');
-    });
+            const strandId = $this.data("strand");
 
+            // Reset active state
+            $cards.removeClass("active");
+            $this.addClass("active");
+
+            if (strandId === "all") {
+                // Reset filter
+                dataTable.search("");
+            } else {
+                // Find the Strand code text from the clicked card
+                const strandCode = $this.find(".strand-code").text().trim();
+                // Search the Strand column (3rd column in table)
+                dataTable.search(strandCode);
+            }
+        });
+
+        // Carousel control visibility
+        const $prevBtn = $(".carousel-control-prev");
+        const $nextBtn = $(".carousel-control-next");
+
+        if ($cards.length > 4) {
+            $prevBtn.show();
+            $nextBtn.show();
+        } else {
+            $prevBtn.hide();
+            $nextBtn.hide();
+        }
+    }
+    
     function student_page_js() {
         const $cards = $(".strand-card");
 

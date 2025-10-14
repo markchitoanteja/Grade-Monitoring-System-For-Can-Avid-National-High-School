@@ -71,7 +71,9 @@ if (!isset($_SESSION["user_id"])) {
                                 $grades = $db->run_custom_query("
                                     SELECT 
                                         grades.id, 
-                                        CONCAT(students.first_name, ' ', students.last_name) AS student_name, 
+                                        students.first_name, 
+                                        students.middle_name,
+                                        students.last_name, 
                                         subjects.name AS subject_name, 
                                         grades.quarter_1, grades.quarter_2, grades.quarter_3, grades.quarter_4,
                                         grades.final_grade, 
@@ -80,6 +82,7 @@ if (!isset($_SESSION["user_id"])) {
                                     JOIN students ON grades.student_id = students.id 
                                     JOIN subjects ON grades.subject_id = subjects.id 
                                     ORDER BY grades.id DESC
+
                                 ");
                                 ?>
 
@@ -134,7 +137,15 @@ if (!isset($_SESSION["user_id"])) {
                                         $average_display = is_null($average) ? "Not Yet Available" : number_format($average, 2) . "%";
                                         ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($grade["student_name"]) ?></td>
+                                            <?php
+                                            // Extract and format name properly
+                                            $last = ucwords(strtolower($grade['last_name']));
+                                            $first = ucwords(strtolower($grade['first_name']));
+                                            $middle = isset($grade['middle_name']) && $grade['middle_name'] != '' ? strtoupper(substr($grade['middle_name'], 0, 1)) . '.' : '';
+
+                                            $formatted_name = "{$last}, {$first} {$middle}";
+                                            ?>
+                                            <td><?= htmlspecialchars(trim($formatted_name)) ?></td>
                                             <td><?= htmlspecialchars($grade["subject_name"]) ?></td>
                                             <td><?= htmlspecialchars($semester) ?></td>
                                             <td><?= $final_grade_display ?></td>

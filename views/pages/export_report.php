@@ -18,10 +18,59 @@ if (!isset($db)) {
     $db = new Database();
 }
 
+// 🔹 Read filters
 $year = isset($_GET['year']) && is_numeric($_GET['year']) ? intval($_GET['year']) : null;
-$filename = $year ? "CNHS_Grade_Report_{$year}.pdf" : "CNHS_All_Grade_Reports.pdf";
+$strand_id = isset($_GET['strand_id']) && is_numeric($_GET['strand_id']) ? intval($_GET['strand_id']) : null;
+$subject_id = isset($_GET['subject_id']) && is_numeric($_GET['subject_id']) ? intval($_GET['subject_id']) : null;
 
-// Collect HTML content
+// 🔹 Build WHERE clause
+$where = [];
+if ($year) $where[] = "YEAR(g.created_at) = {$year}";
+if ($strand_id) $where[] = "s.strand_id = {$strand_id}";
+if ($subject_id) $where[] = "g.subject_id = {$subject_id}";
+$whereSQL = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+// 🔹 Fetch grades
+$grades = $db->run_custom_query("
+    SELECT 
+        g.*, 
+        sub.name AS subject_name,
+        st.name AS strand_name,
+        s.last_name,
+        s.first_name,
+        s.middle_name
+    FROM grades g
+    JOIN students s ON g.student_id = s.id
+    JOIN subjects sub ON g.subject_id = sub.id
+    JOIN strands st ON s.strand_id = st.id
+    $whereSQL
+    ORDER BY st.name, sub.name, s.last_name, s.first_name
+");
+
+// 🔹 Format student names
+foreach ($grades as &$g) {
+    $lname = ucfirst(strtolower(trim($g['last_name'])));
+    $fname = ucfirst(strtolower(trim($g['first_name'])));
+    $mname = trim($g['middle_name']);
+    $mInitial = $mname ? strtoupper(substr($mname, 0, 1)) . '.' : '';
+    $g['student_name'] = "{$lname}, {$fname} {$mInitial}";
+}
+
+// 🔹 Title
+$title_parts = [];
+if ($year) $title_parts[] = "S.Y. {$year}";
+if ($strand_id) {
+    $strand = $db->run_custom_query("SELECT name FROM strands WHERE id = {$strand_id} LIMIT 1");
+    if (!empty($strand)) $title_parts[] = $strand[0]['name'];
+}
+if ($subject_id) {
+    $subject = $db->run_custom_query("SELECT name FROM subjects WHERE id = {$subject_id} LIMIT 1");
+    if (!empty($subject)) $title_parts[] = $subject[0]['name'];
+}
+$title = implode(" — ", $title_parts) ?: "Grade Report";
+$filename = str_replace(" ", "_", $title) . ".pdf";
+
+// 🔹 Start HTML
 ob_start();
 ?>
 
@@ -29,52 +78,55 @@ ob_start();
 
 <head>
     <meta charset="utf-8">
+
     <style>
         @page {
-            margin: 130px 40px 100px 40px;
+            margin: 140px 40px 100px 40px;
         }
 
         body {
-            font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
-            font-size: 12px;
+            font-family: "Segoe UI", "DejaVu Sans", Arial, sans-serif;
+            font-size: 13px;
             color: #333;
-            line-height: 1.5;
+            line-height: 1.4;
+            background-color: #fff;
         }
 
-        header {
+        /* === HEADER (Unified design with .school-header style) === */
+        header.school-header {
             position: fixed;
-            top: -110px;
+            top: -120px;
             left: 0;
             right: 0;
-            height: 100px;
             text-align: center;
-            border-bottom: 2px solid #004080;
-            padding-bottom: 10px;
+            border-bottom: 3px solid #004080;
+            padding-bottom: 12px;
         }
 
-        header img {
-            height: 65px;
-            margin-bottom: 5px;
+        header.school-header img {
+            height: 80px;
+            margin-bottom: 8px;
         }
 
-        header h2 {
-            font-size: 18px;
+        header.school-header h2 {
             margin: 0;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 700;
             color: #004080;
         }
 
-        header h3 {
-            font-size: 14px;
-            margin: 4px 0;
-            color: #444;
+        header.school-header h3 {
+            margin: 3px 0;
+            font-size: 16px;
+            color: #333;
         }
 
-        header p {
-            font-size: 12px;
-            color: #555;
+        header.school-header p {
+            font-size: 13px;
+            color: #666;
         }
 
+        /* === FOOTER === */
         footer {
             position: fixed;
             bottom: -70px;
@@ -91,28 +143,34 @@ ob_start();
             content: counter(page);
         }
 
-        main {
-            margin-top: 20px;
-        }
-
-        h4 {
+        /* === TABLES & TITLES === */
+        h3.section-title {
+            background: #f0f6ff;
+            border-left: 5px solid #004080;
+            padding: 8px 10px;
             color: #004080;
-            margin-top: 30px;
+            font-weight: bold;
+            margin-top: 40px;
             margin-bottom: 10px;
-            border-bottom: 1px solid #004080;
-            display: inline-block;
-            padding-bottom: 3px;
             font-size: 13px;
         }
 
+        h4.subject-title {
+            color: #003366;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 12.5px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 3px;
+        }
+
         table {
-            border-collapse: separate;
-            border-spacing: 0;
             width: 100%;
-            margin: 15px 0 30px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            overflow: hidden;
+            border-collapse: collapse;
+            font-size: 11.5px;
+            margin-top: 8px;
+            margin-bottom: 25px;
+            page-break-inside: avoid;
         }
 
         th,
@@ -120,30 +178,24 @@ ob_start();
             border: 1px solid #ccc;
             padding: 6px 8px;
             text-align: center;
+            vertical-align: middle;
         }
 
         th {
-            background-color: #f4f7fb;
-            font-weight: bold;
+            background-color: #e8f0fa;
             color: #003366;
-            font-size: 11.5px;
+            font-weight: bold;
+        }
+
+        td.text-start {
+            text-align: left;
         }
 
         tr:nth-child(even) td {
-            background-color: #f9fbfd;
+            background-color: #fafafa;
         }
 
-        td {
-            font-size: 11.5px;
-        }
-
-        .no-data {
-            color: #888;
-            font-style: italic;
-            text-align: center;
-            background: #f9f9f9;
-        }
-
+        /* === SIGNATURES & MISC === */
         .signature-section {
             margin-top: 80px;
             text-align: center;
@@ -152,215 +204,99 @@ ob_start();
         .signature-line {
             display: inline-block;
             width: 200px;
-            margin: 20px 30px;
+            margin: 25px;
             border-top: 1px solid #333;
             font-size: 11px;
             padding-top: 5px;
         }
 
-        .summary-title {
-            color: #004080;
-            font-weight: bold;
+        .no-data {
             text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .section {
-            margin-bottom: 40px;
+            color: #777;
+            font-style: italic;
+            margin-top: 60px;
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <!-- Optional: Uncomment and set correct logo path -->
-        <!-- <img src="path_to_logo.png" alt="School Logo"> -->
+    <header class="school-header">
+        <img src="<?= base_url('public/assets/img/logo.png') ?>" alt="School Logo">
         <h2>Can-Avid National High School</h2>
         <h3>Senior High School Department</h3>
-        <?php if ($year): ?>
-            <p><strong>School Year:</strong> <?= htmlspecialchars($year) ?></p>
-        <?php else: ?>
-            <p><strong>All Yearly Summary Report</strong></p>
-        <?php endif; ?>
+        <p><strong><?= htmlspecialchars($title) ?></strong></p>
     </header>
+
+    <main>
+        <?php if (!empty($grades)): ?>
+            <?php
+            $grouped = [];
+            foreach ($grades as $g) {
+                $grouped[$g['strand_name']][$g['subject_name']][] = $g;
+            }
+
+            foreach ($grouped as $strand_name => $subjects):
+            ?>
+                <?php foreach ($subjects as $subject_name => $records): ?>
+                    <?php
+                    $visibleQuarters = [];
+                    foreach (['quarter_1', 'quarter_2', 'quarter_3', 'quarter_4'] as $q) {
+                        foreach ($records as $r) {
+                            if (!empty($r[$q]) && $r[$q] > 0) {
+                                $visibleQuarters[$q] = true;
+                                break;
+                            }
+                        }
+                    }
+                    ?>
+
+                    <table style="margin-top: 100px;">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <?php if (!empty($visibleQuarters['quarter_1'])): ?><th>Quarter 1</th><?php endif; ?>
+                                <?php if (!empty($visibleQuarters['quarter_2'])): ?><th>Quarter 2</th><?php endif; ?>
+                                <?php if (!empty($visibleQuarters['quarter_3'])): ?><th>Quarter 3</th><?php endif; ?>
+                                <?php if (!empty($visibleQuarters['quarter_4'])): ?><th>Quarter 4</th><?php endif; ?>
+                                <th>Final Grade</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($records as $r): ?>
+                                <tr>
+                                    <td class="text-start"><?= htmlspecialchars($r['student_name']) ?></td>
+                                    <?php if (!empty($visibleQuarters['quarter_1'])): ?><td><?= $r['quarter_1'] ?: '—' ?></td><?php endif; ?>
+                                    <?php if (!empty($visibleQuarters['quarter_2'])): ?><td><?= $r['quarter_2'] ?: '—' ?></td><?php endif; ?>
+                                    <?php if (!empty($visibleQuarters['quarter_3'])): ?><td><?= $r['quarter_3'] ?: '—' ?></td><?php endif; ?>
+                                    <?php if (!empty($visibleQuarters['quarter_4'])): ?><td><?= $r['quarter_4'] ?: '—' ?></td><?php endif; ?>
+                                    <td><?= $r['final_grade'] ?: '—' ?></td>
+                                    <td><?= htmlspecialchars($r['remarks'] ?: '—') ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+
+            <div class="signature-section">
+                <div class="signature-line">Prepared by:</div>
+                <div class="signature-line">Checked by:</div>
+                <div class="signature-line">Approved by:</div>
+            </div>
+        <?php else: ?>
+            <p class="no-data">No grade records found for the selected filters.</p>
+        <?php endif; ?>
+    </main>
 
     <footer>
         <p>
-            Generated by: <strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Administrator') ?></strong> |
-            Date: <?= date('F d, Y h:i A') ?><br>
-            <span class="page-number">Page </span>
+            Printed by: <strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Administrator') ?></strong> |
+            Date Printed: <?= date('F d, Y h:i A') ?><br>
+            <span class="page-number">Page </span><br>
+            <em>Can-Avid National High School — Senior High School Department</em>
         </p>
     </footer>
-
-    <main>
-        <?php
-        if ($year) {
-            $grades = $db->run_custom_query("
-                SELECT 
-                    CONCAT(students.first_name, ' ', students.last_name) AS student_name,
-                    subjects.name AS subject_name,
-                    grades.quarter_1, grades.quarter_2, grades.quarter_3, grades.quarter_4,
-                    grades.final_grade, grades.remarks
-                FROM grades
-                JOIN students ON grades.student_id = students.id
-                JOIN subjects ON grades.subject_id = subjects.id
-                WHERE YEAR(grades.created_at) = {$year}
-                ORDER BY students.last_name, students.first_name, subjects.name
-            ");
-
-            if ($grades) {
-                $first_sem = [];
-                $second_sem = [];
-
-                foreach ($grades as $g) {
-                    $q1 = floatval($g['quarter_1']);
-                    $q2 = floatval($g['quarter_2']);
-                    $q3 = floatval($g['quarter_3']);
-                    $q4 = floatval($g['quarter_4']);
-
-                    $has_first_sem = ($q1 > 0 || $q2 > 0);
-                    $has_second_sem = ($q3 > 0 || $q4 > 0);
-
-                    if ($has_first_sem) $first_sem[] = $g;
-                    if ($has_second_sem) $second_sem[] = $g;
-                }
-
-                // --- FIRST SEMESTER ---
-                echo "<div class='section'><h4>First Semester</h4>";
-                echo "<table>
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Subject</th>
-                                <th>Quarter 1</th>
-                                <th>Quarter 2</th>
-                                <th>Computed Final Grade</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead><tbody>";
-
-                if (!empty($first_sem)) {
-                    foreach ($first_sem as $g) {
-                        $q1 = floatval($g['quarter_1']);
-                        $q2 = floatval($g['quarter_2']);
-                        $vals = array_filter([$q1, $q2]);
-                        $computed = count($vals) ? number_format(array_sum($vals) / count($vals), 2) : '';
-
-                        echo "<tr>
-                                <td>" . htmlspecialchars($g['student_name']) . "</td>
-                                <td>" . htmlspecialchars($g['subject_name']) . "</td>
-                                <td>" . ($q1 ?: '') . "</td>
-                                <td>" . ($q2 ?: '') . "</td>
-                                <td>{$computed}</td>
-                                <td>" . htmlspecialchars($g['remarks'] ?: '') . "</td>
-                              </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6' class='no-data'>No records found for First Semester</td></tr>";
-                }
-                echo "</tbody></table></div>";
-
-                // --- SECOND SEMESTER ---
-                echo "<div class='section'><h4>Second Semester</h4>";
-                echo "<table>
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Subject</th>
-                                <th>Quarter 3</th>
-                                <th>Quarter 4</th>
-                                <th>Computed Final Grade</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead><tbody>";
-
-                if (!empty($second_sem)) {
-                    foreach ($second_sem as $g) {
-                        $q3 = floatval($g['quarter_3']);
-                        $q4 = floatval($g['quarter_4']);
-                        $vals = array_filter([$q3, $q4]);
-                        $computed = count($vals) ? number_format(array_sum($vals) / count($vals), 2) : '';
-
-                        echo "<tr>
-                                <td>" . htmlspecialchars($g['student_name']) . "</td>
-                                <td>" . htmlspecialchars($g['subject_name']) . "</td>
-                                <td>" . ($q3 ?: '') . "</td>
-                                <td>" . ($q4 ?: '') . "</td>
-                                <td>{$computed}</td>
-                                <td>" . htmlspecialchars($g['remarks'] ?: '') . "</td>
-                              </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6' class='no-data'>No records found for Second Semester</td></tr>";
-                }
-                echo "</tbody></table></div>";
-            } else {
-                echo "<h4>First Semester</h4>
-                      <table>
-                        <thead><tr>
-                            <th>Student Name</th><th>Subject</th><th>Quarter 1</th><th>Quarter 2</th><th>Computed Final Grade</th><th>Remarks</th>
-                        </tr></thead>
-                        <tbody><tr><td colspan='6' class='no-data'>No grade records found for this year.</td></tr></tbody>
-                      </table>";
-
-                echo "<h4>Second Semester</h4>
-                      <table>
-                        <thead><tr>
-                            <th>Student Name</th><th>Subject</th><th>Quarter 3</th><th>Quarter 4</th><th>Computed Final Grade</th><th>Remarks</th>
-                        </tr></thead>
-                        <tbody><tr><td colspan='6' class='no-data'>No grade records found for this year.</td></tr></tbody>
-                      </table>";
-            }
-
-            // Signature section for teachers/admins
-            echo "
-            <div class='signature-section'>
-                <div class='signature-line'>Prepared by:</div>
-                <div class='signature-line'>Checked by:</div>
-                <div class='signature-line'>Approved by:</div>
-            </div>";
-        } else {
-            // --- ALL YEARLY SUMMARY ---
-            echo "<h4>All Yearly Summary</h4>";
-            $grades = $db->run_custom_query("
-                SELECT 
-                    YEAR(created_at) AS year,
-                    COUNT(*) AS total_records,
-                    COUNT(DISTINCT student_id) AS total_students,
-                    COUNT(DISTINCT subject_id) AS total_subjects
-                FROM grades
-                GROUP BY YEAR(created_at)
-                ORDER BY YEAR(created_at) DESC
-            ");
-
-            echo "<table>
-                    <thead>
-                        <tr>
-                            <th>School Year</th>
-                            <th>Total Students</th>
-                            <th>Total Subjects</th>
-                            <th>Total Records</th>
-                        </tr>
-                    </thead><tbody>";
-
-            if ($grades) {
-                foreach ($grades as $r) {
-                    echo "<tr>
-                            <td>{$r['year']}</td>
-                            <td>{$r['total_students']}</td>
-                            <td>{$r['total_subjects']}</td>
-                            <td>{$r['total_records']}</td>
-                          </tr>";
-                }
-            } else {
-                echo "<tr><td colspan='4' class='no-data'>No data available.</td></tr>";
-            }
-
-            echo "</tbody></table>";
-        }
-        ?>
-    </main>
 </body>
 
 </html>
@@ -368,7 +304,7 @@ ob_start();
 <?php
 $html = ob_get_clean();
 
-// --- Initialize Dompdf ---
+// 🔹 Dompdf setup
 $options = new Options();
 $options->set('isRemoteEnabled', true);
 $dompdf = new Dompdf($options);
@@ -376,7 +312,7 @@ $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 
-// Output PDF
+// 🔹 Output PDF
 $dompdf->stream($filename, ["Attachment" => true]);
 exit;
 ?>

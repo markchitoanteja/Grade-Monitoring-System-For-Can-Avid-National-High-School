@@ -239,6 +239,17 @@ class Database
     }
 
     /**
+     * Escapes a string for safe SQL queries.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function escape($value)
+    {
+        return $this->connection->real_escape_string($value);
+    }
+
+    /**
      * Selects a single row from a table based on a condition.
      *
      * @param string $table
